@@ -1,21 +1,21 @@
 import { Canvas, CanvasOptions, TOptions, Point as FabricPoint } from "fabric";
-import OpenSeadragon, { Point, Viewer } from "openseadragon";
+import OpenSeadragon from "openseadragon";
 
 export interface FabricOverlayConfig {
   fabricCanvasOptions: TOptions<CanvasOptions>;
 }
 
 export class FabricOverlay {
-  private _viewer: Viewer;
-  private _canvas: HTMLCanvasElement;
-  private _fabricCanvas: Canvas;
+  private readonly _viewer: OpenSeadragon.Viewer;
+  private readonly _canvas: HTMLCanvasElement;
+  private readonly _fabricCanvas: Canvas;
 
-  private _id: string;
+  private readonly _id: string;
   private _containerWidth: number;
   private _containerHeight: number;
-  private _canvasDiv: HTMLDivElement;
+  private readonly _canvasDiv: HTMLDivElement;
 
-  viewer(): Viewer {
+  viewer(): OpenSeadragon.Viewer {
     return this._viewer;
   }
   canvas(): HTMLCanvasElement {
@@ -44,7 +44,7 @@ export class FabricOverlay {
     }
   }
   resizeFabric(): void {
-    let origin = new Point(0, 0);
+    let origin = new OpenSeadragon.Point(0, 0);
     let viewportZoom = this._viewer.viewport.getZoom(true);
     let viewportToImageZoom =
       this._viewer.viewport.viewportToImageZoom(viewportZoom);
@@ -95,11 +95,27 @@ export class FabricOverlay {
     this._viewer.world.getItemAt(0).setRotation(deg, true);
   }
 
+  private isRequiredPluginRestored = (): boolean => {
+    if (!OpenSeadragon) {
+      console.error('[openseadragon-canvas-overlay] requires OpenSeadragon');
+      return false;
+    }
+    if (!Canvas) {
+      console.error('[fabric-js] requires FabricJS');
+      console.error('Please import FabricJS before importing this package');
+      return false;
+    }
+    return true;
+  }
+
   constructor(
-    viewer: Viewer,
+    viewer: OpenSeadragon.Viewer,
     { fabricCanvasOptions = { selection: false } }: FabricOverlayConfig,
     id: number
   ) {
+    if(!this.isRequiredPluginRestored()) {
+      throw new Error("[openseadragon-fabric-overlay] required plugins are not installed");
+    }
     let self = this;
 
     this._viewer = viewer;

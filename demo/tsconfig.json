@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "..",          // Allow imports from parent folder
+    "outDir": "../dist-demo",
+    "types": ["vite/client"]
+  },
+  "include": [
+    "../src/**/*",            // Include your library source
+    "./**/*"                  // Include demo files
+  ]
+}
