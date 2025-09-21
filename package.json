@@ -11,7 +11,8 @@
     "dev": "vite --config site/vite.config.ts",
     "build:demo": "npm run build && vite build --config site/vite.config.ts --mode prod",
     "deploy:demo": "npm run build && npm run build:demo && git subtree push --prefix site/dist origin gh-pages",
-    "prepare": "npm run build"
+    "prepare": "npm run build",
+    "test": "echo 'No tests are added'"
   },
   "repository": {
     "type": "git",

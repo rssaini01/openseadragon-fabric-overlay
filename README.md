@@ -102,6 +102,8 @@ If you need a non-interactive canvas, simply disable interactions during initial
    ```bash
    npm publish
    ```
+---
+Demo can be checked here: [Demo](https://rssaini01.github.io/openseadragon-fabric-overlay/)
 
 ---
 
