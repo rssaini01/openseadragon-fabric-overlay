@@ -1,8 +1,15 @@
 import { defineConfig } from "vite";
+import path from 'path';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   root: "./demo",
-  server: {
-    port: 5173,
+  base: mode === "prod" ? "/openseadragon-fabric/" : "/",
+  resolve: {
+    alias: {
+      "openseadragon-fabric-overlay":
+        mode === "prod"
+          ? path.resolve(__dirname, "../dist/fabric-overlay.ts")
+          : path.resolve(__dirname, "../src/fabric-overlay.ts"),
+    }
   },
-});
+}));

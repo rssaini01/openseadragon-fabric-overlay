@@ -21,7 +21,7 @@ Import the plugin **after** importing OpenSeadragon:
 
 ```ts
 import OpenSeadragon from 'openseadragon';
-import { FabricOverlay } from 'openseadragon-fabric-overlay';
+import { createOSDFabricOverlay } from 'openseadragon-fabric-overlay';
 ```
 
 Initialize the overlay when creating your viewer:
@@ -29,7 +29,7 @@ Initialize the overlay when creating your viewer:
 ```ts
 const viewer = OpenSeadragon(config);
 
-const fabricOverlay = new FabricOverlay(viewer, {
+const fabricOverlay = createOSDFabricOverlay(viewer, {
   fabricCanvasOptions: { selection: false },
 }, 1);
 ```

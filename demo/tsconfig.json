@@ -1,12 +1,16 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "rootDir": "..",          // Allow imports from parent folder
-    "outDir": "../dist-demo",
-    "types": ["vite/client"]
+    "outDir": "dist",
+    "rootDir": "..",
+    "baseUrl": ".",
+    "paths": {
+      "openseadragon-fabric-overlay": [
+        "../src/fabric-overlay.ts"
+      ]
+    }
   },
   "include": [
-    "../src/**/*",            // Include your library source
-    "./**/*"                  // Include demo files
+    "./**/*"
   ]
 }

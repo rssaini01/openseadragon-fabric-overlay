@@ -5,7 +5,7 @@ export interface FabricOverlayConfig {
   fabricCanvasOptions: TOptions<CanvasOptions>;
 }
 
-export class FabricOverlay {
+class FabricOverlay {
   private readonly _viewer: OpenSeadragon.Viewer;
   private readonly _canvas: HTMLCanvasElement;
   private readonly _fabricCanvas: Canvas;
@@ -18,18 +18,23 @@ export class FabricOverlay {
   viewer(): OpenSeadragon.Viewer {
     return this._viewer;
   }
+
   canvas(): HTMLCanvasElement {
     return this._canvas;
   }
+
   fabricCanvas(): Canvas {
     return this._fabricCanvas;
   }
+
   clearFabric(): void {
     this._fabricCanvas.clear();
   }
+
   renderAllFabric(): void {
     this._fabricCanvas.renderAll();
   }
+
   resizeCanvas(): void {
     if (this._containerWidth !== this._viewer.container.clientWidth) {
       this._containerWidth = this._viewer.container.clientWidth;
@@ -43,11 +48,11 @@ export class FabricOverlay {
       this._canvas.setAttribute("height", String(this._containerHeight));
     }
   }
+
   resizeFabric(): void {
     let origin = new OpenSeadragon.Point(0, 0);
     let viewportZoom = this._viewer.viewport.getZoom(true);
-    let viewportToImageZoom =
-      this._viewer.viewport.viewportToImageZoom(viewportZoom);
+    let viewportToImageZoom = this._viewer.viewport.viewportToImageZoom(viewportZoom);
     this._fabricCanvas.setWidth(this._containerWidth);
     this._fabricCanvas.setHeight(this._containerHeight);
 
@@ -95,27 +100,12 @@ export class FabricOverlay {
     this._viewer.world.getItemAt(0).setRotation(deg, true);
   }
 
-  private isRequiredPluginRestored = (): boolean => {
-    if (!OpenSeadragon) {
-      console.error('[openseadragon-canvas-overlay] requires OpenSeadragon');
-      return false;
-    }
-    if (!Canvas) {
-      console.error('[fabric-js] requires FabricJS');
-      console.error('Please import FabricJS before importing this package');
-      return false;
-    }
-    return true;
-  }
 
   constructor(
     viewer: OpenSeadragon.Viewer,
-    { fabricCanvasOptions = { selection: false } }: FabricOverlayConfig,
-    id: number
+    {fabricCanvasOptions = {selection: false}}: FabricOverlayConfig,
+    id: string
   ) {
-    if(!this.isRequiredPluginRestored()) {
-      throw new Error("[openseadragon-fabric-overlay] required plugins are not installed");
-    }
     let self = this;
 
     this._viewer = viewer;
@@ -182,3 +172,26 @@ export class FabricOverlay {
     });
   }
 }
+
+const isRequiredPluginInstalled = (): boolean => {
+  if (!OpenSeadragon) {
+    console.error('[openseadragon-canvas-overlay] requires OpenSeadragon');
+    return false;
+  }
+  if (!Canvas) {
+    console.error('[fabric-js] requires FabricJS');
+    console.error('Please import FabricJS before importing this package');
+    return false;
+  }
+  return true;
+}
+
+export function createOSDFabricOverlay(viewer: OpenSeadragon.Viewer, options: FabricOverlayConfig, id: string): FabricOverlay {
+  if (!isRequiredPluginInstalled()) {
+    throw new Error("[openseadragon-fabric-overlay] required plugins are not installed");
+  }
+
+  return new FabricOverlay(viewer, options, id);
+}
+
+export type { FabricOverlay }

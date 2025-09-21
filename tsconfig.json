@@ -10,12 +10,8 @@
     "strict": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "baseUrl": ".",
-    "paths": {
-      "openseadragon-fabric-overlay": [
-        "../src/fabric-overlay.ts"
-      ]
-    }
+    "declaration": true,
+    "baseUrl": "."
   },
   "include": [
     "src/**/*"

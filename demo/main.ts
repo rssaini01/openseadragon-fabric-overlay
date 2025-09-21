@@ -1,5 +1,5 @@
 import OpenSeadragon from "openseadragon";
-import { FabricOverlay } from "../src/fabric-overlay";
+import { FabricOverlay, createOSDFabricOverlay } from "openseadragon-fabric-overlay";
 import * as fabric from "fabric";
 
 // Init OSD
@@ -10,10 +10,10 @@ const viewer = OpenSeadragon({
 });
 
 // Init Fabric Overlay
-const fabricOverlay = new FabricOverlay(
+const fabricOverlay: FabricOverlay = createOSDFabricOverlay(
   viewer,
-  {fabricCanvasOptions: {selection: false}},
-  1
+  { fabricCanvasOptions: { selection: false } },
+  "1"
 );
 
 // Example: add a rectangle after load
