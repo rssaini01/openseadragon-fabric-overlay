@@ -1,17 +1,22 @@
 {
-  "name": "openseadragon-fabric",
-  "version": "1.0.8",
+  "name": "openseadragon-fabric-overlay",
+  "version": "1.1.0",
   "description": "A OpenSeaDragon plugin to allow the use of FabricJS overlay",
-  "main": "lib/openseadragon-fabric.js",
-  "types": "lib/openseadragon-fabric.d.ts",
+  "type": "module",
+  "main": "dist/fabric-canvas.js",
+  "types": "dist/fabric-canvas.d.ts",
   "scripts": {
-    "clear": "rm -rf ./lib && mkdir lib",
-    "build": "npm run clear && tsc --declaration",
-    "dev": "ts-node-dev --respawn --transpile-only --ignore-watch node_modules --no-notify src/openseadragon-fabric.ts"
+    "clean": "rm -rf ./dist ./site/dist",
+    "build": "npm run clean && tsc",
+    "dev": "vite --config site/vite.config.ts",
+    "build:demo": "npm run build && vite build --config site/vite.config.ts --mode prod",
+    "deploy:demo": "npm run build && npm run build:demo && git subtree push --prefix site/dist origin gh-pages",
+    "prepare": "npm run build",
+    "test": "echo 'No tests are added'"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/brunoocastro/openseadragon-fabric.git"
+    "url": "git+https://github.com/rssaini01/openseadragon-fabric-overlay.git"
   },
   "keywords": [
     "openseadragon",
@@ -21,19 +26,18 @@
     "fabricjs",
     "overlay"
   ],
-  "author": "Bruno Castro",
+  "author": "Ravi Shankar",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/brunoocastro/openseadragon-fabric/issues"
+    "url": "https://github.com/rssaini01/openseadragon-fabric-overlay/issues"
   },
-  "homepage": "https://github.com/brunoocastro/openseadragon-fabric#readme",
+  "homepage": "https://github.com/rssaini01/openseadragon-fabric-overlay#readme",
   "devDependencies": {
-    "@types/fabric": "^5.3.6",
-    "@types/node": "^20.9.2",
-    "@types/openseadragon": "^3.0.10",
-    "fabric": "^6.4.2",
-    "openseadragon": "^4.1.0",
-    "ts-node-dev": "^2.0.0",
-    "typescript": "^5.3.2"
+    "@types/openseadragon": "^4.1.0",
+    "fabric": "^6.7.1",
+    "gh-pages": "^6.3.0",
+    "openseadragon": "^5.0.1",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.6"
   }
 }

@@ -1,69 +1,70 @@
-# FabricJS Plugin - OpenSeaDragon
+# FabricJS Overlay for OpenSeadragon
 
-A plugin for **[OpenSeaDragon](https://openseadragon.github.io/)** that integrates **[FabricJS](http://fabricjs.com/)** as an overlay to enable the creation and display of many shapes (as rectangles, circles, texts and much more) on high-resolution zoomable images.
+A lightweight plugin for **[OpenSeadragon](https://openseadragon.github.io/)** that integrates **[FabricJS](http://fabricjs.com/)** as an interactive overlay.
+This allows you to draw and manage shapes (rectangles, circles, text, freehand drawings, and more) directly on top of zoomable, high-resolution images.
 
-*Feel free to contribute*
+> 💡 Contributions are always welcome!
 
-Installation
+---
+
+## 📦 Installation
 
 ```bash
-npm i openseadragon-fabric
+npm install openseadragon-fabric-overlay
 ```
 
-## How to use
+---
 
-You just need to import this library after the OpenSeaDragon import.
+## 🚀 Getting Started
+
+Import the plugin **after** importing OpenSeadragon:
 
 ```ts
 import OpenSeadragon from 'openseadragon';
-import { initOSDFabricJS } from 'openseadragon-fabric';
+import { createOSDFabricOverlay } from 'openseadragon-fabric-overlay';
 ```
 
-Then, init the fabric plugin like this, before the creation of your viewers:
+Initialize the overlay when creating your viewer:
 
 ```ts
-initOSDFabricJS();
-
 const viewer = OpenSeadragon(config);
 
-const fabricOverlay = viewer.fabricOverlay({
+const fabricOverlay = createOSDFabricOverlay(viewer, {
   fabricCanvasOptions: { selection: false },
-});
+}, 1);
 ```
 
-The created `fabricOverlay` instance has many methods, with it, you can access the `fabricCanvas` and manipulate it, like adding a rectangle, as in the above example:
+---
+
+## ✏️ Usage Examples
+
+### Add Shapes
+
+You can directly access the underlying FabricJS canvas through the overlay instance:
 
 ```ts
-initOSDFabricJS();
-
-const fabricOverlay = newViewer.fabricOverlay({
-      fabricCanvasOptions: { selection: false },
-    });
-
 const newRect = new fabric.Rect({
-    width: 200,
-    height: 100,
-    top: 1400,
-    left: 1200,
-    fill: 'rgba(0,0,0,0.1)',
-    stroke: '#000000',
-    strokeWidth: 5,
-  })
+  width: 200,
+  height: 100,
+  top: 1400,
+  left: 1200,
+  fill: 'rgba(0,0,0,0.1)',
+  stroke: '#000000',
+  strokeWidth: 5,
+});
 
 fabricOverlay.fabricCanvas().add(newRect);
 ```
 
-You also can use the FreeHand drawing mode, like this:
+---
+
+### Enable Freehand Drawing
+
+Freehand drawing is supported via FabricJS brushes:
 
 ```ts
-initOSDFabricJS();
-
-const fabricOverlay = newViewer.fabricOverlay({
-      fabricCanvasOptions: { selection: false },
-    });
-
-//Needs to be set to false to disable default mouse navigation in OSD.
-newViewer.setMouseNavEnabled(false);
+// Disable default mouse navigation in OpenSeadragon
+viewer.setMouseNavEnabled(false);
 
 fabricOverlay.fabricCanvas().freeDrawingBrush = new fabric.PencilBrush(fabricOverlay.fabricCanvas());
 fabricOverlay.fabricCanvas().freeDrawingBrush.width = 15;
@@ -71,30 +72,43 @@ fabricOverlay.fabricCanvas().freeDrawingBrush.color = selectedColor;
 fabricOverlay.fabricCanvas().isDrawingMode = true;
 ```
 
-Now, this lib doesn't support FabricJS static canvases. If you need a canvas without interactions, just disable it on the creation.
+---
 
-## How to contribute
+### Static Canvas Mode
 
-When finishing a new implementation, update the package version in `package.json`, check the documentation and make a new build.
+Static FabricJS canvases are **not** supported by this library.
+If you need a non-interactive canvas, simply disable interactions during initialization.
 
-```bash
-npm run build
-```
+---
 
-## How to test
+## 🛠️ Contributing
 
-With the new build, manually copy all files (this entire repository) to the `node_modules/openseadragon-fabric` folder on a project that already uses this library.
-After ensuring that every  is working correctly, run the above instruction to publish the new package version on [NPM](https://www.npmjs.com/package/openseadragon-fabric):
+1. Make your changes.
+2. Update the package version in `package.json`.
+3. Rebuild the project:
 
-```bash
-npm publish
-```
+   ```bash
+   npm run build
+   ```
 
-### Thanks
+---
 
-Thanks, [CapybaHub](https://github.com/CapybaHub), for allowing this open-source plugin.
+## 🔍 Testing Locally
 
-This version was inspired by:
+1. After building, copy the entire repository into your project’s `node_modules/openseadragon-fabric-overlay` folder.
+2. Verify everything works as expected.
+3. Once tested, publish the package to [NPM](https://www.npmjs.com/package/openseadragon-fabric-overlay):
 
-- [altert/OpenseadragonFabricjsOverlay](https://github.com/altert/OpenseadragonFabricjsOverlay) - Thanks, [@altert](https://github.com/altert)
-- [damjarling/openseadragon-fabricjs-overlay](https://www.npmjs.com/package/@adamjarling/openseadragon-fabricjs-overlay) - Thanks, [@adamjarling](https://www.npmjs.com/package/@adamjarling)
+   ```bash
+   npm publish
+   ```
+---
+Demo can be checked here: [Demo](https://rssaini01.github.io/openseadragon-fabric-overlay/)
+
+---
+
+## 🙏 Acknowledgments
+
+This project is based on prior work from:
+
+* [openseadragon-fabric](https://github.com/brunoocastro/openseadragon-fabric) — Thanks [@brunoocastro](https://github.com/brunoocastro)

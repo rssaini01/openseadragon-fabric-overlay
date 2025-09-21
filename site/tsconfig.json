@@ -1,0 +1,16 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "..",
+    "baseUrl": ".",
+    "paths": {
+      "openseadragon-fabric-overlay": [
+        "../src/fabric-overlay.ts"
+      ]
+    }
+  },
+  "include": [
+    "./**/*"
+  ]
+}
