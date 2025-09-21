@@ -6,15 +6,16 @@
   "main": "dist/fabric-canvas.js",
   "types": "dist/fabric-canvas.d.ts",
   "scripts": {
-    "clean": "rm -rf ./dist",
+    "clean": "rm -rf ./dist ./site/dist",
     "build": "npm run clean && tsc",
-    "dev": "vite demo",
-    "deploy:demo": "npm run build && cd demo && npm run build && git subtree push --prefix demo/dist origin gh-pages",
+    "dev": "vite --config site/vite.config.ts",
+    "build:demo": "npm run build && vite build --config site/vite.config.ts --mode prod",
+    "deploy:demo": "npm run build && npm run build:demo && git subtree push --prefix site/dist origin gh-pages",
     "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rssaini01/openseadragon-fabric.git"
+    "url": "git+https://github.com/rssaini01/openseadragon-fabric-overlay.git"
   },
   "keywords": [
     "openseadragon",
@@ -27,12 +28,13 @@
   "author": "Ravi Shankar",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/rssaini01/openseadragon-fabric/issues"
+    "url": "https://github.com/rssaini01/openseadragon-fabric-overlay/issues"
   },
-  "homepage": "https://github.com/rssaini01/openseadragon-fabric#readme",
+  "homepage": "https://github.com/rssaini01/openseadragon-fabric-overlay#readme",
   "devDependencies": {
     "@types/openseadragon": "^4.1.0",
     "fabric": "^6.7.1",
+    "gh-pages": "^6.3.0",
     "openseadragon": "^5.0.1",
     "typescript": "^5.9.2",
     "vite": "^7.1.6"
