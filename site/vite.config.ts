@@ -3,6 +3,7 @@ import path from 'path';
 
 export default defineConfig(({ mode }) => ({
   root: path.resolve(__dirname),
+  base: mode === "prod" ? "/openseadragon-fabric-overlay" : "/",
   resolve: {
     alias: {
       "openseadragon-fabric-overlay":
