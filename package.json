@@ -1,17 +1,16 @@
 {
   "name": "openseadragon-fabric-overlay",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "A OpenSeaDragon plugin to allow the use of FabricJS overlay",
   "type": "module",
-  "main": "dist/fabric-canvas.js",
-  "types": "dist/fabric-canvas.d.ts",
+  "main": "dist/fabric-overlay.js",
+  "types": "dist/fabric-overlay.d.ts",
   "scripts": {
     "clean": "rm -rf ./dist ./site/dist",
     "build": "npm run clean && tsc",
     "dev": "vite --config site/vite.config.ts",
     "build:demo": "npm run build && vite build --config site/vite.config.ts --mode prod",
     "deploy:demo": "npm run build && npm run build:demo && git subtree push --prefix site/dist origin gh-pages",
-    "prepare": "npm run build",
     "test": "echo 'No tests are added'"
   },
   "repository": {
