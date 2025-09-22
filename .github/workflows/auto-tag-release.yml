@@ -1,0 +1,55 @@
+name: Auto Tag & Release on Version Bump
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  tag-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # important for tags
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get package.json version
+        id: package
+        run: echo "version=$(jq -r .version package.json)" >> $GITHUB_OUTPUT
+
+      - name: Get latest tag
+        id: tag
+        run: |
+          latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          # strip "v" prefix if exists
+          latest_version="${latest_tag#v}"
+          echo "latest=$latest_version" >> $GITHUB_OUTPUT
+
+      - name: Create Git tag if needed
+        if: steps.package.outputs.version != steps.tag.outputs.latest
+        run: |
+          new_tag="v${{ steps.package.outputs.version }}"
+          echo "Tagging new version: $new_tag"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "$new_tag" -m "Release $new_tag"
+          git push origin "$new_tag"
+
+      - name: Create GitHub Release
+        if: steps.package.outputs.version != steps.tag.outputs.latest
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.package.outputs.version }}
+          name: v${{ steps.package.outputs.version }}
+          body: |
+            Release v${{ steps.package.outputs.version }}
+
+            - Automated release based on package.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}

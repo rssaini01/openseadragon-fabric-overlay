@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
-import path from 'path';
+import path from "path";
 
 export default defineConfig(({ mode }) => ({
   root: path.resolve(__dirname),
@@ -8,9 +8,9 @@ export default defineConfig(({ mode }) => ({
     alias: {
       "openseadragon-fabric-overlay":
         mode === "prod"
-          ? path.resolve(__dirname, "../dist/fabric-overlay.js")
+          ? path.resolve(__dirname, "../dist/esm/fabric-overlay.js")
           : path.resolve(__dirname, "../src/fabric-overlay.ts"),
-    }
+    },
   },
   build: {
     outDir: path.resolve(__dirname, "dist"),
@@ -18,5 +18,5 @@ export default defineConfig(({ mode }) => ({
     rollupOptions: {
       input: path.resolve(__dirname, "index.html"),
     },
-  }
+  },
 }));

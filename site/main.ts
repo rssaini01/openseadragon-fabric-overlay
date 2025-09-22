@@ -1,20 +1,27 @@
 import OpenSeadragon from "openseadragon";
-import { FabricOverlay, createOSDFabricOverlay } from "openseadragon-fabric-overlay";
+import {
+  FabricOverlay,
+  FabricOverlayConfig,
+  initOSDFabricOverlay,
+} from "openseadragon-fabric-overlay";
 import * as fabric from "fabric";
 
 // Init OSD
 const viewer = OpenSeadragon({
   id: "openseadragon",
   prefixUrl: "https://openseadragon.github.io/openseadragon/images/",
-  tileSources: "https://openseadragon.github.io/example-images/highsmith/highsmith.dzi",
+  tileSources:
+    "https://openseadragon.github.io/example-images/highsmith/highsmith.dzi",
 });
 
+const options: FabricOverlayConfig = {
+  fabricCanvasOptions: {
+    selection: false,
+  },
+};
+
 // Init Fabric Overlay
-const fabricOverlay: FabricOverlay = createOSDFabricOverlay(
-  viewer,
-  { fabricCanvasOptions: { selection: false } },
-  "1"
-);
+const fabricOverlay: FabricOverlay = initOSDFabricOverlay(viewer, options, "1");
 
 // Example: add a rectangle after load
 viewer.addHandler("open", () => {
