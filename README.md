@@ -3,30 +3,30 @@
 A lightweight plugin for **[OpenSeadragon](https://openseadragon.github.io/)** that integrates **[FabricJS](http://fabricjs.com/)** as an interactive overlay.
 This allows you to draw and manage shapes (rectangles, circles, text, freehand drawings, and more) directly on top of zoomable, high-resolution images.
 
-> 💡 Contributions are always welcome!
+> Contributions are always welcome!
 
 ---
 
-## 📦 Installation
+## Installation
 
-```bash
+```shell
 npm install openseadragon-fabric-overlay
 ```
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 Import the plugin **after** importing OpenSeadragon:
 
-```ts
+```typescript
 import OpenSeadragon from 'openseadragon';
 import { createOSDFabricOverlay } from 'openseadragon-fabric-overlay';
 ```
 
 Initialize the overlay when creating your viewer:
 
-```ts
+```typescript
 const viewer = OpenSeadragon(config);
 
 const fabricOverlay = createOSDFabricOverlay(viewer, {
@@ -36,13 +36,13 @@ const fabricOverlay = createOSDFabricOverlay(viewer, {
 
 ---
 
-## ✏️ Usage Examples
+## Usage Examples
 
 ### Add Shapes
 
 You can directly access the underlying FabricJS canvas through the overlay instance:
 
-```ts
+```typescript
 const newRect = new fabric.Rect({
   width: 200,
   height: 100,
@@ -62,7 +62,7 @@ fabricOverlay.fabricCanvas().add(newRect);
 
 Freehand drawing is supported via FabricJS brushes:
 
-```ts
+```typescript
 // Disable default mouse navigation in OpenSeadragon
 viewer.setMouseNavEnabled(false);
 
@@ -81,33 +81,36 @@ If you need a non-interactive canvas, simply disable interactions during initial
 
 ---
 
-## 🛠️ Contributing
+## Contributing
 
 1. Make your changes.
 2. Update the package version in `package.json`.
 3. Rebuild the project:
 
-   ```bash
+   ```shell
    npm run build
    ```
 
 ---
 
-## 🔍 Testing Locally
+## Testing Locally
 
 1. After building, copy the entire repository into your project’s `node_modules/openseadragon-fabric-overlay` folder.
 2. Verify everything works as expected.
 3. Once tested, publish the package to [NPM](https://www.npmjs.com/package/openseadragon-fabric-overlay):
 
-   ```bash
+   ```shell
    npm publish
    ```
 ---
+
+## Demo
+
 Demo can be checked here: [Demo](https://rssaini01.github.io/openseadragon-fabric-overlay/)
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 This project is based on prior work from:
 
