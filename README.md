@@ -1,5 +1,10 @@
 # FabricJS Overlay for OpenSeadragon
 
+[![npm version](https://img.shields.io/npm/v/openseadragon-fabric-overlay.svg)](https://www.npmjs.com/package/openseadragon-fabric-overlay)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/rssaini01/openseadragon-fabric-overlay/deploy-demo-site.yml?branch=main)](https://github.com/rssaini01/openseadragon-fabric-overlay/actions)
+[![Downloads](https://img.shields.io/npm/dm/openseadragon-fabric-overlay.svg)](https://www.npmjs.com/package/openseadragon-fabric-overlay)
+
 A lightweight plugin for **[OpenSeadragon](https://openseadragon.github.io/)** that integrates **[FabricJS](http://fabricjs.com/)** as an interactive overlay.
 This allows you to draw and manage shapes (rectangles, circles, text, freehand drawings, and more) directly on top of zoomable, high-resolution images.
 
@@ -20,8 +25,8 @@ npm install openseadragon-fabric-overlay
 Import the plugin **after** importing OpenSeadragon:
 
 ```typescript
-import OpenSeadragon from 'openseadragon';
-import { createOSDFabricOverlay } from 'openseadragon-fabric-overlay';
+import OpenSeadragon from "openseadragon";
+import { createOSDFabricOverlay } from "openseadragon-fabric-overlay";
 ```
 
 Initialize the overlay when creating your viewer:
@@ -29,9 +34,13 @@ Initialize the overlay when creating your viewer:
 ```typescript
 const viewer = OpenSeadragon(config);
 
-const fabricOverlay = createOSDFabricOverlay(viewer, {
-  fabricCanvasOptions: { selection: false },
-}, 1);
+const fabricOverlay = createOSDFabricOverlay(
+  viewer,
+  {
+    fabricCanvasOptions: { selection: false },
+  },
+  1
+);
 ```
 
 ---
@@ -48,8 +57,8 @@ const newRect = new fabric.Rect({
   height: 100,
   top: 1400,
   left: 1200,
-  fill: 'rgba(0,0,0,0.1)',
-  stroke: '#000000',
+  fill: "rgba(0,0,0,0.1)",
+  stroke: "#000000",
   strokeWidth: 5,
 });
 
@@ -66,7 +75,9 @@ Freehand drawing is supported via FabricJS brushes:
 // Disable default mouse navigation in OpenSeadragon
 viewer.setMouseNavEnabled(false);
 
-fabricOverlay.fabricCanvas().freeDrawingBrush = new fabric.PencilBrush(fabricOverlay.fabricCanvas());
+fabricOverlay.fabricCanvas().freeDrawingBrush = new fabric.PencilBrush(
+  fabricOverlay.fabricCanvas()
+);
 fabricOverlay.fabricCanvas().freeDrawingBrush.width = 15;
 fabricOverlay.fabricCanvas().freeDrawingBrush.color = selectedColor;
 fabricOverlay.fabricCanvas().isDrawingMode = true;
@@ -102,6 +113,7 @@ If you need a non-interactive canvas, simply disable interactions during initial
    ```shell
    npm publish
    ```
+
 ---
 
 ## Demo
@@ -114,4 +126,4 @@ Demo can be checked here: [Demo](https://rssaini01.github.io/openseadragon-fabri
 
 This project is based on prior work from:
 
-* [openseadragon-fabric](https://github.com/brunoocastro/openseadragon-fabric) — Thanks [@brunoocastro](https://github.com/brunoocastro)
+- [openseadragon-fabric](https://github.com/brunoocastro/openseadragon-fabric) — Thanks [@brunoocastro](https://github.com/brunoocastro)

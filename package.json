@@ -27,7 +27,7 @@
     "overlay"
   ],
   "author": "Ravi Shankar",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/rssaini01/openseadragon-fabric-overlay/issues"
   },
@@ -35,7 +35,6 @@
   "devDependencies": {
     "@types/openseadragon": "^4.1.0",
     "fabric": "^6.7.1",
-    "gh-pages": "^6.3.0",
     "openseadragon": "^5.0.1",
     "rimraf": "^6.0.1",
     "typescript": "^5.9.2",
