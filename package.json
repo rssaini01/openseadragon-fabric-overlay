@@ -1,6 +1,6 @@
 {
   "name": "openseadragon-fabric-overlay",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "OpenSeadragon plugin for adding a Fabric.js overlay with drawing and annotation support.",
   "type": "module",
   "main": "dist/cjs/fabric-overlay.js",
