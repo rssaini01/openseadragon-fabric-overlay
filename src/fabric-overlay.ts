@@ -1,14 +1,14 @@
-import { Canvas, CanvasOptions, Point as FabricPoint } from "fabric";
+import * as fabric from "fabric";
 import OpenSeadragon from "openseadragon";
 
 export interface FabricOverlayConfig {
-  fabricCanvasOptions: Partial<CanvasOptions>;
+  fabricCanvasOptions: Partial<fabric.CanvasOptions>;
 }
 
 class FabricOverlay {
   private readonly _viewer: OpenSeadragon.Viewer;
   private readonly _canvas: HTMLCanvasElement;
-  private readonly _fabricCanvas: Canvas;
+  private readonly _fabricCanvas: fabric.Canvas;
 
   private readonly _id: string;
   private _containerWidth: number;
@@ -23,7 +23,7 @@ class FabricOverlay {
     return this._canvas;
   }
 
-  fabricCanvas(): Canvas {
+  fabricCanvas(): fabric.Canvas {
     return this._fabricCanvas;
   }
 
@@ -72,7 +72,7 @@ class FabricOverlay {
     let pageScroll = OpenSeadragon.getPageScroll();
 
     this._fabricCanvas.absolutePan(
-      new FabricPoint(
+      new fabric.Point(
         canvasOffset.left - x + pageScroll.x,
         canvasOffset.top - y + pageScroll.y
       )
@@ -128,7 +128,7 @@ class FabricOverlay {
     this._canvasDiv.appendChild(this._canvas);
     this.resizeCanvas();
 
-    this._fabricCanvas = new Canvas(this._canvas, fabricCanvasOptions);
+    this._fabricCanvas = new fabric.Canvas(this._canvas, fabricCanvasOptions);
 
     /**
      * Prevent OSD mousedown on fabric objects
@@ -178,7 +178,7 @@ const isRequiredPluginInstalled = (): boolean => {
     console.error("[openseadragon-fabric-overlay] requires OpenSeadragon");
     return false;
   }
-  if (!Canvas) {
+  if (!fabric.Canvas) {
     console.error("[openseadragon-fabric-overlay] requires FabricJS");
     console.error("Please import FabricJS before importing this package");
     return false;
