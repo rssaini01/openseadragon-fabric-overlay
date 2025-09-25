@@ -1,7 +1,7 @@
 {
   "name": "openseadragon-fabric-overlay",
   "version": "1.1.4",
-  "description": "A OpenSeaDragon plugin to allow the use of FabricJS overlay",
+  "description": "OpenSeadragon plugin for adding a Fabric.js overlay with drawing and annotation support.",
   "type": "module",
   "main": "dist/cjs/fabric-overlay.js",
   "module": "dist/esm/fabric-overlay.js",
@@ -13,8 +13,13 @@
     }
   },
   "engines": {
-    "node": ">=16"
+    "node": ">=18"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "clean": "rimraf ./dist ./site/dist",
     "build": "npm run build:dual",
@@ -31,18 +36,27 @@
   },
   "keywords": [
     "openseadragon",
-    "osd",
-    "plugin",
-    "fabric",
     "fabricjs",
-    "overlay"
+    "canvas",
+    "overlay",
+    "annotations",
+    "annotation",
+    "drawing",
+    "shapes",
+    "zoomable",
+    "image-viewer",
+    "deepzoom",
+    "tilesource",
+    "interactive",
+    "fabric",
+    "plugin"
   ],
   "author": "Ravi Shankar",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/rssaini01/openseadragon-fabric-overlay/issues"
   },
-  "homepage": "https://github.com/rssaini01/openseadragon-fabric-overlay#readme",
+  "homepage": "https://rssaini01.github.io/openseadragon-fabric-overlay/",
   "devDependencies": {
     "@types/openseadragon": "^4.1.0",
     "fabric": "^6.7.1",
