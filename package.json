@@ -1,6 +1,6 @@
 {
   "name": "openseadragon-fabric-overlay",
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "OpenSeadragon plugin for adding a Fabric.js overlay with drawing and annotation support.",
   "type": "module",
   "main": "dist/cjs/fabric-overlay.js",
@@ -51,7 +51,7 @@
     "fabric",
     "plugin"
   ],
-  "author": "Ravi Shankar",
+  "author": "Ravi Shankar Saini",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/rssaini01/openseadragon-fabric-overlay/issues"
