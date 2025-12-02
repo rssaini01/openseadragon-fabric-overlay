@@ -51,5 +51,6 @@ jobs:
             Release v${{ steps.package.outputs.version }}
 
             - Automated release based on package.json
+            - Compare [${{steps.tag.outputs.latest}}...${{steps.package.outputs.version}}](https://github.com/rssaini01/openseadragon-fabric-overlay/compare/${{steps.tag.outputs.latest}}...${{steps.package.outputs.version}})
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
