@@ -21,7 +21,7 @@
     "LICENSE"
   ],
   "scripts": {
-    "clean": "rimraf ./dist ./site/dist",
+    "clean": "node ./scripts/clean.mjs",
     "build": "npm run build:dual",
     "build:dual": "npm run clean && tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json",
     "dev": "vite --config site/vite.config.ts",
@@ -61,7 +61,6 @@
     "@types/openseadragon": "^5.0.1",
     "fabric": "^6.9.0",
     "openseadragon": "^5.0.1",
-    "rimraf": "^6.1.0",
     "typescript": "^5.9.2",
     "vite": "^7.1.6"
   }
