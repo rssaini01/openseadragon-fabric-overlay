@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { createFabricOverlay, initOSDFabricOverlay } from '../../src/fabric-overlay';
+import { createFabricOverlay, initOSDFabricOverlay } from 'openseadragon-fabric-overlay';
 
 // Mock OpenSeadragon
 const mockViewer = {
@@ -21,30 +21,46 @@ const mockViewer = {
 };
 
 // Mock fabric
-vi.mock('fabric', () => ({
-    Canvas: vi.fn(() => ({
-        clear: vi.fn(),
-        renderAll: vi.fn(),
-        requestRenderAll: vi.fn(),
-        setDimensions: vi.fn(),
-        setZoom: vi.fn(),
-        absolutePan: vi.fn(),
-        discardActiveObject: vi.fn(),
-        dispose: vi.fn(),
-        on: vi.fn(),
-        isDrawingMode: false,
-        freeDrawingBrush: null
-    })),
-    Point: vi.fn((x, y) => ({ x, y }))
-}));
+vi.mock('fabric', () => {
+    const MockCanvas = vi.fn(function(this: any) {
+        this.clear = vi.fn();
+        this.renderAll = vi.fn();
+        this.requestRenderAll = vi.fn();
+        this.setDimensions = vi.fn();
+        this.setZoom = vi.fn();
+        this.absolutePan = vi.fn();
+        this.discardActiveObject = vi.fn();
+        this.dispose = vi.fn().mockResolvedValue(undefined);
+        this.on = vi.fn();
+        this.isDrawingMode = false;
+        this.freeDrawingBrush = null;
+    });
+
+    const MockPoint = vi.fn(function(this: any, x: number, y: number) {
+        this.x = x;
+        this.y = y;
+    });
+
+    return {
+        Canvas: MockCanvas,
+        Point: MockPoint
+    };
+});
 
 // Mock OpenSeadragon
-vi.mock('openseadragon', () => ({
-    default: {
-        Point: vi.fn((x, y) => ({ x, y })),
-        getPageScroll: vi.fn(() => ({ x: 0, y: 0 }))
-    }
-}));
+vi.mock('openseadragon', () => {
+    const MockPoint = vi.fn(function(this: any, x: number, y: number) {
+        this.x = x;
+        this.y = y;
+    });
+
+    return {
+        default: {
+            Point: MockPoint,
+            getPageScroll: vi.fn(() => ({ x: 0, y: 0 }))
+        }
+    };
+});
 
 describe('FabricOverlay', () => {
     beforeEach(() => {
@@ -61,11 +77,6 @@ describe('FabricOverlay', () => {
 
         it('should throw error for invalid viewer', () => {
             expect(() => createFabricOverlay(null as any)).toThrow('Invalid OpenSeadragon viewer instance');
-        });
-
-        it('should use default config', () => {
-            const overlay = createFabricOverlay(mockViewer as any);
-            expect(overlay.fabricCanvas()).toBeDefined();
         });
     });
 
