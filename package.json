@@ -58,6 +58,7 @@
   },
   "homepage": "https://rssaini01.github.io/openseadragon-fabric-overlay/",
   "devDependencies": {
+    "@types/node": "^25.0.3",
     "@types/openseadragon": "^5.0.1",
     "fabric": "^6.9.0",
     "openseadragon": "^5.0.1",

@@ -1,5 +1,5 @@
 import { defineConfig } from "vite";
-import path from "path";
+import path from "node:path";
 
 export default defineConfig(({ mode }) => ({
   root: path.resolve(__dirname),

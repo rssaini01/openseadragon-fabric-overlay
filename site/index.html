@@ -2,11 +2,45 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OpenSeadragon + Fabric Overlay Demo</title>
     <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-<div id="openseadragon" style="width: 100vw; height: 100vh;"></div>
-<script type="module" src="main.ts"></script>
+    <header class="header">
+        <h1>OpenSeadragon + Fabric Overlay</h1>
+        <div class="mode-toggle">
+            <button id="fabricMode" class="mode-btn active">Fabric Mode</button>
+            <button id="osdMode" class="mode-btn">Navigation Mode</button>
+        </div>
+    </header>
+    
+    <div class="toolbar" id="toolbar">
+        <div class="tool-group">
+            <button class="tool-btn" id="selectTool" title="Select">✋</button>
+            <button class="tool-btn" id="drawTool" title="Freehand Draw">✏️</button>
+        </div>
+        
+        <div class="tool-group">
+            <button class="tool-btn" id="rectTool" title="Rectangle">⬜</button>
+            <button class="tool-btn" id="circleTool" title="Circle">⭕</button>
+            <button class="tool-btn" id="textTool" title="Text">T</button>
+        </div>
+        
+        <div class="tool-group">
+            <input type="color" id="colorPicker" value="#ff0000" title="Color">
+            <input type="range" id="brushSize" min="1" max="50" value="5" title="Brush Size">
+        </div>
+        
+        <div class="tool-group">
+            <button class="tool-btn" id="clearAll" title="Clear All">🗑️</button>
+        </div>
+    </div>
+    
+    <main class="main-content">
+        <div id="openseadragon"></div>
+    </main>
+    
+    <script type="module" src="main.ts"></script>
 </body>
 </html>
