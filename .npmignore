@@ -1,0 +1,11 @@
+tests/
+vitest.config.ts
+*.test.ts
+*.spec.ts
+.github/
+scripts/
+site/
+src/
+tsconfig*.json
+.gitignore
+.nvmrc

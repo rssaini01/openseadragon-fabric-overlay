@@ -3,8 +3,12 @@ name: Deploy static content to Pages
 
 on:
   # Runs on pushes targeting the default branch
-  push:
-    branches: ["main"]
+  workflow_run:
+    workflows: ["Build & Test"]
+    types:
+      - completed
+    branches:
+      - main
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:

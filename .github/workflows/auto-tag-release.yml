@@ -1,7 +1,10 @@
 name: Auto Tag & Release on Version Bump
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Build & Test"]
+    types:
+      - completed
     branches:
       - main
 

@@ -21,7 +21,8 @@
     "LICENSE"
   ],
   "workspaces": [
-    "site"
+    "site",
+    "test-workspace"
   ],
   "scripts": {
     "clean": "node ./scripts/clean.mjs",
@@ -30,7 +31,8 @@
     "dev": "npm run -w site dev",
     "build:demo": "npm run build && npm run -w site build",
     "deploy:demo": "npm run build && npm run build:demo && git subtree push --prefix site/dist origin gh-pages",
-    "test": "echo 'No tests are added'",
+    "test": "npm run -w test-workspace test",
+    "test:run": "npm run -w test-workspace test:run",
     "prepare": "npm run build"
   },
   "repository": {
