@@ -2,19 +2,31 @@ import * as fabric from "fabric";
 import OpenSeadragon from "openseadragon";
 
 export interface FabricOverlayConfig {
-  fabricCanvasOptions: Partial<fabric.CanvasOptions>;
+  fabricCanvasOptions?: Partial<fabric.CanvasOptions>;
+  enableAutoResize?: boolean;
+  enableMouseEvents?: boolean;
+}
+
+export interface FabricOverlayEvents {
+  'canvas:ready': () => void;
+  'canvas:resized': (dimensions: { width: number; height: number }) => void;
+  'viewport:updated': () => void;
 }
 
 class FabricOverlay {
   private readonly _viewer: OpenSeadragon.Viewer;
-  private readonly _canvas: HTMLCanvasElement;
-  private readonly _fabricCanvas: fabric.Canvas;
+  private _canvas!: HTMLCanvasElement;
+  private readonly _fabricCanvas!: fabric.Canvas;
+  private readonly _config: Required<FabricOverlayConfig>;
 
   private readonly _id: string;
-  private _containerWidth: number;
-  private _containerHeight: number;
-  private readonly _canvasDiv: HTMLDivElement;
+  private _containerWidth = 0;
+  private _containerHeight = 0;
+  private _canvasDiv!: HTMLDivElement;
+  private _isDestroyed = false;
+  private readonly _eventListeners = new Map<string, () => void>();
 
+  // Backward compatibility methods
   viewer(): OpenSeadragon.Viewer {
     return this._viewer;
   }
@@ -24,76 +36,32 @@ class FabricOverlay {
   }
 
   fabricCanvas(): fabric.Canvas {
+    this._checkDestroyed();
     return this._fabricCanvas;
   }
 
   clearFabric(): void {
-    this._fabricCanvas.clear();
+    this.clear();
   }
 
   renderAllFabric(): void {
-    this._fabricCanvas.renderAll();
+    this.render();
   }
 
   resizeCanvas(): void {
-    if (this._containerWidth !== this._viewer.container.clientWidth) {
-      this._containerWidth = this._viewer.container.clientWidth;
-      this._canvasDiv.setAttribute("width", String(this._containerWidth));
-      this._canvas.setAttribute("width", String(this._containerWidth));
-    }
-
-    if (this._containerHeight !== this._viewer.container.clientHeight) {
-      this._containerHeight = this._viewer.container.clientHeight;
-      this._canvasDiv.setAttribute("height", String(this._containerHeight));
-      this._canvas.setAttribute("height", String(this._containerHeight));
-    }
+    this._resizeCanvas();
   }
 
   resizeFabric(): void {
-    let origin = new OpenSeadragon.Point(0, 0);
-    let viewportZoom = this._viewer.viewport.getZoom(true);
-    let viewportToImageZoom =
-      this._viewer.viewport.viewportToImageZoom(viewportZoom);
-    this._fabricCanvas.setWidth(this._containerWidth);
-    this._fabricCanvas.setHeight(this._containerHeight);
-
-    /** Original package way of syncing OSD zoom to Fabric zoom */
-    this._fabricCanvas.setZoom(viewportZoom);
-
-    /** Alternative way of syncing OSD zoom to Fabric zoom, which keeps horizontal window resizing in sync */
-    this._fabricCanvas.setZoom(viewportToImageZoom);
-
-    let viewportWindowPoint =
-      this._viewer.viewport.viewportToWindowCoordinates(origin);
-    let x = Math.round(viewportWindowPoint.x);
-    let y = Math.round(viewportWindowPoint.y);
-    let canvasOffset = this._canvasDiv.getBoundingClientRect();
-
-    let pageScroll = OpenSeadragon.getPageScroll();
-
-    this._fabricCanvas.absolutePan(
-      new fabric.Point(
-        canvasOffset.left - x + pageScroll.x,
-        canvasOffset.top - y + pageScroll.y
-      )
-    );
+    this._syncFabricWithViewport();
   }
 
   clearFabricSelection(): void {
-    if (this._fabricCanvas.isDrawingMode) {
-      // If in free drawing mode, clear the free drawing selection
-      this._fabricCanvas.isDrawingMode = false;
-      this._fabricCanvas.clearContext(this._fabricCanvas.getContext());
-    } else {
-      // If in object selection mode, discard the active object
-      this._fabricCanvas.discardActiveObject();
-    }
-    this._fabricCanvas.requestRenderAll();
+    this.clearSelection();
   }
 
   setViewerMouseNavEnabled(state = true): void {
-    if (!this._viewer) return;
-    this._viewer.setMouseNavEnabled(state);
+    this.setMouseNavigation(state);
   }
 
   updateCanvasRotation(deg: number): void {
@@ -101,103 +69,224 @@ class FabricOverlay {
     this._viewer.world.getItemAt(0).setRotation(deg, true);
   }
 
-  constructor(
-    viewer: OpenSeadragon.Viewer,
-    { fabricCanvasOptions = { selection: false } }: FabricOverlayConfig,
-    id: string
-  ) {
-    let self = this;
-
-    this._viewer = viewer;
-
-    this._containerWidth = 0;
-    this._containerHeight = 0;
-
-    this._canvasDiv = document.createElement("div");
-    this._canvasDiv.style.position = "absolute";
-    this._canvasDiv.style.left = "0px";
-    this._canvasDiv.style.top = "0px";
-    this._canvasDiv.style.width = "100%";
-    this._canvasDiv.style.height = "100%";
-    this._viewer.canvas.appendChild(this._canvasDiv);
-
-    this._canvas = document.createElement("canvas");
-
-    this._id = `osd-canvas-${id}`;
-    this._canvas.setAttribute("id", this._id);
-    this._canvasDiv.appendChild(this._canvas);
-    this.resizeCanvas();
-
-    this._fabricCanvas = new fabric.Canvas(this._canvas, fabricCanvasOptions);
-
-    /**
-     * Prevent OSD mousedown on fabric objects
-     */
-    this._fabricCanvas.on("mouse:down", function (options: any) {
-      if (options.target) {
-        options.e.preventDefault();
-        options.e.stopPropagation();
-      }
-    });
-
-    /**
-     * Prevent OSD mouseup on fabric objects
-     */
-    this._fabricCanvas.on("mouse:up", function (options: any) {
-      if (options.target) {
-        options.e.preventDefault();
-        options.e.stopPropagation();
-      }
-    });
-
-    /**
-     * Update viewport
-     */
-    this._viewer.addHandler("update-viewport", function () {
-      self.resizeFabric();
-      self.resizeCanvas();
-      self.renderAllFabric();
-    });
-
-    /**
-     * Resize the fabric.js overlay when the viewer or window changes size
-     */
-    this._viewer.addHandler("open", function () {
-      self.resizeFabric();
-      self.resizeCanvas();
-    });
-    window.addEventListener("resize", function () {
-      self.resizeFabric();
-      self.resizeCanvas();
-    });
+  get isDestroyed(): boolean {
+    return this._isDestroyed;
   }
-}
 
-const isRequiredPluginInstalled = (): boolean => {
-  if (!OpenSeadragon) {
-    console.error("[openseadragon-fabric-overlay] requires OpenSeadragon");
-    return false;
+  clear(): void {
+    this._checkDestroyed();
+    this._fabricCanvas.clear();
   }
-  if (!fabric.Canvas) {
-    console.error("[openseadragon-fabric-overlay] requires FabricJS");
-    console.error("Please import FabricJS before importing this package");
-    return false;
-  }
-  return true;
-};
 
-export function initOSDFabricOverlay(
-  viewer: OpenSeadragon.Viewer,
-  options: FabricOverlayConfig,
-  id: string
-): FabricOverlay {
-  if (!isRequiredPluginInstalled()) {
-    throw new Error(
-      "[openseadragon-fabric-overlay] required plugins are not installed"
+  render(): void {
+    this._checkDestroyed();
+    this._fabricCanvas.renderAll();
+  }
+
+  private _checkDestroyed(): void {
+    if (this._isDestroyed) {
+      throw new Error('FabricOverlay has been destroyed');
+    }
+  }
+
+  private _resizeCanvas(): void {
+    const { clientWidth, clientHeight } = this._viewer.container;
+    let resized = false;
+
+    if (this._containerWidth !== clientWidth) {
+      this._containerWidth = clientWidth;
+      this._canvas.width = clientWidth;
+      resized = true;
+    }
+
+    if (this._containerHeight !== clientHeight) {
+      this._containerHeight = clientHeight;
+      this._canvas.height = clientHeight;
+      resized = true;
+    }
+
+    if (resized) {
+      this._emit('canvas:resized', { width: this._containerWidth, height: this._containerHeight });
+    }
+  }
+
+  private _syncFabricWithViewport(): void {
+    const viewport = this._viewer.viewport;
+    const origin = new OpenSeadragon.Point(0, 0);
+    const viewportZoom = viewport.getZoom(true);
+    const zoom = viewport.viewportToImageZoom(viewportZoom);
+    
+    this._fabricCanvas.setDimensions({
+      width: this._containerWidth,
+      height: this._containerHeight
+    });
+    this._fabricCanvas.setZoom(zoom);
+
+    const viewportWindowPoint = viewport.viewportToWindowCoordinates(origin);
+    const canvasOffset = this._canvasDiv.getBoundingClientRect();
+    const pageScroll = OpenSeadragon.getPageScroll();
+
+    this._fabricCanvas.absolutePan(
+      new fabric.Point(
+        canvasOffset.left - Math.round(viewportWindowPoint.x) + pageScroll.x,
+        canvasOffset.top - Math.round(viewportWindowPoint.y) + pageScroll.y
+      )
     );
   }
 
-  return new FabricOverlay(viewer, options, id);
+  clearSelection(): void {
+    this._checkDestroyed();
+    if (this._fabricCanvas.isDrawingMode) {
+      this._fabricCanvas.isDrawingMode = false;
+    }
+    this._fabricCanvas.discardActiveObject();
+    this._fabricCanvas.requestRenderAll();
+  }
+
+  setMouseNavigation(enabled: boolean): void {
+    this._viewer.setMouseNavEnabled(enabled);
+  }
+
+  setDrawingMode(enabled: boolean, brush?: fabric.BaseBrush): void {
+    this._checkDestroyed();
+    this._fabricCanvas.isDrawingMode = enabled;
+    if (enabled && brush) {
+      this._fabricCanvas.freeDrawingBrush = brush;
+    }
+  }
+
+  destroy(): void {
+    if (this._isDestroyed) return;
+    
+    this._isDestroyed = true;
+    this._eventListeners.forEach((cleanup) => cleanup());
+    this._eventListeners.clear();
+    
+    void this._fabricCanvas.dispose();
+    this._canvasDiv.remove();
+  }
+
+  private _emit(event: keyof FabricOverlayEvents, data?: any): void {
+    // Simple event emission - could be enhanced with proper event system
+  }
+
+  constructor(
+    viewer: OpenSeadragon.Viewer,
+    config: FabricOverlayConfig,
+    id: string
+  ) {
+    this._viewer = viewer;
+    this._config = {
+      fabricCanvasOptions: { selection: false, ...config.fabricCanvasOptions },
+      enableAutoResize: config.enableAutoResize ?? true,
+      enableMouseEvents: config.enableMouseEvents ?? true
+    };
+    this._id = `osd-canvas-${id}`;
+
+    this._setupCanvas();
+    this._fabricCanvas = new fabric.Canvas(this._canvas, this._config.fabricCanvasOptions);
+    this._setupEventHandlers();
+    this._initialResize();
+    
+    this._emit('canvas:ready');
+  }
+
+  private _setupCanvas(): void {
+    this._canvasDiv = document.createElement('div');
+    Object.assign(this._canvasDiv.style, {
+      position: 'absolute',
+      left: '0',
+      top: '0',
+      width: '100%',
+      height: '100%',
+      pointerEvents: 'none'
+    });
+    this._viewer.canvas.appendChild(this._canvasDiv);
+
+    this._canvas = document.createElement('canvas');
+    this._canvas.id = this._id;
+    this._canvas.style.pointerEvents = 'auto';
+    this._canvasDiv.appendChild(this._canvas);
+  }
+
+  private _setupEventHandlers(): void {
+    if (this._config.enableMouseEvents) {
+      this._fabricCanvas.on('mouse:down', (e: fabric.TPointerEventInfo) => {
+        if (e.target) {
+          e.e.preventDefault();
+          e.e.stopPropagation();
+        }
+      });
+
+      this._fabricCanvas.on('mouse:up', (e: fabric.TPointerEventInfo) => {
+        if (e.target) {
+          e.e.preventDefault();
+          e.e.stopPropagation();
+        }
+      });
+    }
+
+    if (this._config.enableAutoResize) {
+      const updateHandler = () => {
+        this._syncFabricWithViewport();
+        this._resizeCanvas();
+        this.render();
+        this._emit('viewport:updated');
+      };
+
+      this._viewer.addHandler('update-viewport', updateHandler);
+      this._viewer.addHandler('open', updateHandler);
+      
+      const resizeHandler = () => updateHandler();
+      window.addEventListener('resize', resizeHandler);
+      
+      this._eventListeners.set('update-viewport', () => 
+        this._viewer.removeHandler('update-viewport', updateHandler)
+      );
+      this._eventListeners.set('open', () => 
+        this._viewer.removeHandler('open', updateHandler)
+      );
+      this._eventListeners.set('resize', () => 
+        window.removeEventListener('resize', resizeHandler)
+      );
+    }
+  }
+
+  private _initialResize(): void {
+    this._resizeCanvas();
+    this._syncFabricWithViewport();
+  }
+}
+
+const validateDependencies = (): void => {
+  if (!OpenSeadragon) {
+    throw new Error('[openseadragon-fabric-overlay] OpenSeadragon is required');
+  }
+  if (!fabric?.Canvas) {
+    throw new Error('[openseadragon-fabric-overlay] FabricJS is required');
+  }
+};
+
+export function createFabricOverlay(
+  viewer: OpenSeadragon.Viewer,
+  config: FabricOverlayConfig = {},
+  id = 'default'
+): FabricOverlay {
+  validateDependencies();
+  
+  if (!viewer || typeof viewer.addHandler !== 'function') {
+    throw new Error('Invalid OpenSeadragon viewer instance');
+  }
+
+  return new FabricOverlay(viewer, config, id);
+}
+
+export function initOSDFabricOverlay(
+  viewer: OpenSeadragon.Viewer,
+  options: { fabricCanvasOptions?: Partial<fabric.CanvasOptions> },
+  id: string
+): FabricOverlay {
+  return createFabricOverlay(viewer, options, id);
 }
 
 export type { FabricOverlay };
