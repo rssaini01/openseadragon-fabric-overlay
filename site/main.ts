@@ -16,6 +16,7 @@ class DemoApp {
   private isDrawing = false;
   private startPoint: { x: number; y: number } | null = null;
   private activeShape: fabric.Object | null = null;
+  private selectAllMode = false;
 
   constructor() {
     this.initViewer();
@@ -38,6 +39,7 @@ class DemoApp {
       fabricCanvasOptions: { selection: true },
     };
     this.fabricOverlay = initOSDFabricOverlay(this.viewer, options, "1");
+    this.fabricOverlay.setExactSelection(true);
   }
 
   private initEventListeners() {
@@ -52,13 +54,17 @@ class DemoApp {
     document.getElementById('circleTool')?.addEventListener('click', () => this.setTool('circle'));
     document.getElementById('textTool')?.addEventListener('click', () => this.setTool('text'));
     document.getElementById('clearAll')?.addEventListener('click', () => this.clearAll());
+    document.getElementById('exactSelection')?.addEventListener('change', (e) => {
+      this.fabricOverlay.setExactSelection((e.target as HTMLInputElement).checked);
+    });
+    document.getElementById('selectAllAtPoint')?.addEventListener('click', () => this.toggleSelectAllMode());
 
     // Controls
     document.getElementById('colorPicker')?.addEventListener('change', (e) => {
       this.currentColor = (e.target as HTMLInputElement).value;
       this.updateBrushColor();
     });
-    
+
     document.getElementById('brushSize')?.addEventListener('input', (e) => {
       this.brushSize = Number.parseInt((e.target as HTMLInputElement).value);
       this.updateBrushSize();
@@ -92,13 +98,13 @@ class DemoApp {
 
   private setTool(tool: string) {
     this.currentTool = tool;
-    
+
     // Update UI
     document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
     document.getElementById(tool + 'Tool')?.classList.add('active');
 
     const canvas = this.fabricOverlay.fabricCanvas();
-    
+
     if (tool === 'draw') {
       canvas.isDrawingMode = true;
       canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
@@ -125,40 +131,47 @@ class DemoApp {
 
   private onMouseDown(e: fabric.TPointerEventInfo) {
     if (!this.isFabricMode || this.currentTool === 'draw') return;
-    
+
+    // Select all objects at point mode
+    if (this.selectAllMode) {
+      const pointer = this.fabricOverlay.fabricCanvas().getScenePoint(e.e);
+      this.fabricOverlay.selectAllAtPoint(pointer.x, pointer.y);
+      return;
+    }
+
     // If there's a target (existing object), let Fabric handle it for selection/moving
     if (e.target) return;
-    
+
     // Only create new shapes if no object is selected and not in select mode
     if (this.currentTool === 'select') return;
-    
-    const pointer = this.fabricOverlay.fabricCanvas().getPointer(e.e);
+
+    const pointer = this.fabricOverlay.fabricCanvas().getScenePoint(e.e);
     this.startPoint = { x: pointer.x, y: pointer.y };
     this.isDrawing = true;
-    
+
     if (this.currentTool === 'text') {
       this.createTextShape(pointer.x, pointer.y);
       return;
     }
-    
+
     this.activeShape = this.createDragShape(pointer.x, pointer.y);
     this.fabricOverlay.fabricCanvas().add(this.activeShape);
   }
 
   private onMouseMove(e: fabric.TPointerEventInfo) {
     if (!this.isDrawing || !this.startPoint || !this.activeShape) return;
-    
-    const pointer = this.fabricOverlay.fabricCanvas().getPointer(e.e);
+
+    const pointer = this.fabricOverlay.fabricCanvas().getScenePoint(e.e);
     this.updateDragShape(this.startPoint, pointer);
     this.fabricOverlay.fabricCanvas().renderAll();
   }
 
   private onMouseUp(e: fabric.TPointerEventInfo) {
     if (!this.isDrawing) return;
-    
+
     this.isDrawing = false;
     this.startPoint = null;
-    
+
     if (this.activeShape) {
       this.fabricOverlay.fabricCanvas().setActiveObject(this.activeShape);
       this.activeShape = null;
@@ -196,10 +209,10 @@ class DemoApp {
       (this.activeShape as fabric.Rect).set({ left, top, width, height });
     } else if (this.currentTool === 'circle') {
       const radius = Math.min(width, height) / 2;
-      (this.activeShape as fabric.Circle).set({ 
-        left: start.x - radius, 
-        top: start.y - radius, 
-        radius 
+      (this.activeShape as fabric.Circle).set({
+        left: start.x - radius,
+        top: start.y - radius,
+        radius
       });
     }
   }
@@ -211,13 +224,21 @@ class DemoApp {
       fill: this.currentColor,
       fontSize: 20,
     });
-    
+
     this.fabricOverlay.fabricCanvas().add(shape);
     this.fabricOverlay.fabricCanvas().setActiveObject(shape);
   }
 
   private clearAll() {
     this.fabricOverlay.clearFabric();
+  }
+
+  private toggleSelectAllMode() {
+    this.selectAllMode = !this.selectAllMode;
+    const btn = document.getElementById('selectAllAtPoint');
+    if (btn) {
+      btn.classList.toggle('active', this.selectAllMode);
+    }
   }
 }
 

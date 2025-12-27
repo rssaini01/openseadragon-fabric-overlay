@@ -155,6 +155,27 @@ class FabricOverlay {
         }
     }
 
+    setExactSelection(enabled: boolean): void {
+        this._checkDestroyed();
+        this._fabricCanvas.perPixelTargetFind = enabled;
+        this._fabricCanvas.targetFindTolerance = enabled ? 0 : 4;
+    }
+
+    selectAllAtPoint(x: number, y: number): fabric.FabricObject[] {
+        this._checkDestroyed();
+        const objects = this._fabricCanvas.getObjects().filter(obj => 
+            obj.containsPoint(new fabric.Point(x, y))
+        );
+        if (objects.length > 0) {
+            const selection = new fabric.ActiveSelection(objects, {
+                canvas: this._fabricCanvas
+            });
+            this._fabricCanvas.setActiveObject(selection);
+            this._fabricCanvas.requestRenderAll();
+        }
+        return objects;
+    }
+
     destroy(): void {
         if (this._isDestroyed) return;
 
