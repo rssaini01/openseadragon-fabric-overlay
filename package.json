@@ -22,7 +22,7 @@
   ],
   "workspaces": [
     "site",
-    "test-workspace"
+    "tests"
   ],
   "scripts": {
     "clean": "node ./scripts/clean.mjs",
@@ -31,8 +31,8 @@
     "dev": "npm run -w site dev",
     "build:demo": "npm run build && npm run -w site build",
     "deploy:demo": "npm run build && npm run build:demo && git subtree push --prefix site/dist origin gh-pages",
-    "test": "npm run -w test-workspace test",
-    "test:run": "npm run -w test-workspace test:run",
+    "test": "npm run -w tests test",
+    "test:run": "npm run -w tests test:run",
     "prepare": "npm run build"
   },
   "repository": {
