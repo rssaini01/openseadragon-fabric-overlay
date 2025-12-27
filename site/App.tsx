@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "preact/hooks";
 import { Header } from "./components/Header";
+import { TopBar } from "./components/TopBar";
 import { Toolbar } from "./components/Toolbar";
 import { Viewer } from "./components/Viewer";
 import type { FabricOverlay } from "openseadragon-fabric-overlay";
@@ -63,6 +64,10 @@ export function App() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!isFabricMode) return;
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setCurrentTool("select");
+      }
       if (e.key === "Delete" || e.key === "Backspace") {
         e.preventDefault();
         handleDelete();
@@ -74,47 +79,53 @@ export function App() {
     };
     globalThis.addEventListener("keydown", handleKeyDown);
     return () => globalThis.removeEventListener("keydown", handleKeyDown);
-  }, [isFabricMode]);
+  }, [isFabricMode, handleDelete, handleExport]);
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="flex flex-col h-screen bg-slate-950">
       <Header isFabricMode={isFabricMode} setIsFabricMode={setIsFabricMode} />
       {isFabricMode && (
-        <Toolbar
-          currentTool={currentTool}
-          setCurrentTool={setCurrentTool}
-          currentColor={currentColor}
-          setCurrentColor={setCurrentColor}
-          brushSize={brushSize}
-          setBrushSize={setBrushSize}
-          opacity={opacity}
-          setOpacity={handleOpacityChange}
+        <TopBar
+          onDelete={handleDelete}
+          onClearAll={handleClearAll}
+          onExport={handleExport}
+          objectCount={objectCount}
           exactSelection={exactSelection}
           setExactSelection={setExactSelection}
           selectAllMode={selectAllMode}
           setSelectAllMode={setSelectAllMode}
-          onClearAll={handleClearAll}
-          onDelete={handleDelete}
-          onExport={handleExport}
-          objectCount={objectCount}
         />
       )}
-      <div className="flex-1 relative overflow-hidden bg-black">
-        <Viewer
-          isFabricMode={isFabricMode}
-          currentTool={currentTool}
-          currentColor={currentColor}
-          brushSize={brushSize}
-          opacity={opacity}
-          exactSelection={exactSelection}
-          selectAllMode={selectAllMode}
-          onOverlayReady={(overlay) => {
-            overlayRef.current = overlay;
-            const canvas = overlay.fabricCanvas();
-            canvas.on("object:added", updateObjectCount);
-            canvas.on("object:removed", updateObjectCount);
-          }}
-        />
+      <div className="flex flex-1 overflow-hidden">
+        {isFabricMode && (
+          <Toolbar
+            currentTool={currentTool}
+            setCurrentTool={setCurrentTool}
+            currentColor={currentColor}
+            setCurrentColor={setCurrentColor}
+            brushSize={brushSize}
+            setBrushSize={setBrushSize}
+            opacity={opacity}
+            setOpacity={handleOpacityChange}
+          />
+        )}
+        <div className="flex-1 relative overflow-hidden">
+          <Viewer
+            isFabricMode={isFabricMode}
+            currentTool={currentTool}
+            currentColor={currentColor}
+            brushSize={brushSize}
+            opacity={opacity}
+            exactSelection={exactSelection}
+            selectAllMode={selectAllMode}
+            onOverlayReady={(overlay) => {
+              overlayRef.current = overlay;
+              const canvas = overlay.fabricCanvas();
+              canvas.on("object:added", updateObjectCount);
+              canvas.on("object:removed", updateObjectCount);
+            }}
+          />
+        </div>
       </div>
     </div>
   );
