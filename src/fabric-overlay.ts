@@ -5,6 +5,7 @@ export interface FabricOverlayConfig {
     fabricCanvasOptions?: Partial<fabric.CanvasOptions>;
     enableAutoResize?: boolean;
     enableMouseEvents?: boolean;
+    constrainToImage?: boolean;
 }
 
 export interface FabricOverlayEvents {
@@ -20,6 +21,7 @@ class FabricOverlay {
     private readonly _config: Required<FabricOverlayConfig>;
 
     private readonly _id: string;
+    private _imageBounds: { left: number; top: number; width: number; height: number } | null = null;
     private _containerWidth = 0;
     private _containerHeight = 0;
     private _canvasDiv!: HTMLDivElement;
@@ -161,9 +163,22 @@ class FabricOverlay {
         this._fabricCanvas.targetFindTolerance = enabled ? 0 : 4;
     }
 
+    setConstrainToImage(enabled: boolean): void {
+        this._checkDestroyed();
+        this._config.constrainToImage = enabled;
+        if (enabled) {
+            this._setupConstraintHandlers();
+            this._updateImageBounds();
+            this._fabricCanvas.set({ stopTransformOnLimit: true } as any);
+        } else {
+            this._removeConstraintHandlers();
+            this._fabricCanvas.set({ stopTransformOnLimit: false } as any);
+        }
+    }
+
     selectAllAtPoint(x: number, y: number): fabric.FabricObject[] {
         this._checkDestroyed();
-        const objects = this._fabricCanvas.getObjects().filter(obj => 
+        const objects = this._fabricCanvas.getObjects().filter(obj =>
             obj.containsPoint(new fabric.Point(x, y))
         );
         if (objects.length > 0) {
@@ -200,7 +215,8 @@ class FabricOverlay {
         this._config = {
             fabricCanvasOptions: { selection: false, ...config.fabricCanvasOptions },
             enableAutoResize: config.enableAutoResize ?? true,
-            enableMouseEvents: config.enableMouseEvents ?? true
+            enableMouseEvents: config.enableMouseEvents ?? true,
+            constrainToImage: config.constrainToImage ?? false
         };
         this._id = `osd-canvas-${id}`;
 
@@ -247,10 +263,17 @@ class FabricOverlay {
             });
         }
 
+        if (this._config.constrainToImage) {
+            this._setupConstraintHandlers();
+        }
+
         if (this._config.enableAutoResize) {
             const updateHandler = () => {
                 this._syncFabricWithViewport();
                 this._resizeCanvas();
+                if (this._config.constrainToImage) {
+                    this._updateImageBounds();
+                }
                 this.render();
                 this._emit('viewport:updated');
             };
@@ -276,7 +299,112 @@ class FabricOverlay {
     private _initialResize(): void {
         this._resizeCanvas();
         this._syncFabricWithViewport();
+        if (this._config.constrainToImage) {
+            this._updateImageBounds();
+        }
     }
+
+    private _updateImageBounds(): void {
+        const tiledImage = this._viewer.world.getItemAt(0);
+        if (!tiledImage) {
+            setTimeout(() => this._updateImageBounds(), 100);
+            return;
+        }
+
+        const imgSize = tiledImage.getContentSize();
+        this._imageBounds = {
+            left: 0,
+            top: 0,
+            width: imgSize.x,
+            height: imgSize.y
+        };
+    }
+
+    private _setupConstraintHandlers(): void {
+        this._fabricCanvas.on('object:moving', this._constrainObject);
+        this._fabricCanvas.on('object:scaling', this._constrainObject);
+        this._fabricCanvas.on('object:rotating', this._constrainObject);
+        this._fabricCanvas.on('object:added', this._constrainObject);
+        this._fabricCanvas.on('object:modified', this._constrainObject);
+        this._fabricCanvas.on('mouse:down', this._constrainMouseDown);
+        this._fabricCanvas.on('mouse:move', this._constrainMouseMove);
+    }
+
+    private _removeConstraintHandlers(): void {
+        this._fabricCanvas.off('object:moving', this._constrainObject);
+        this._fabricCanvas.off('object:scaling', this._constrainObject);
+        this._fabricCanvas.off('object:rotating', this._constrainObject);
+        this._fabricCanvas.off('object:added', this._constrainObject);
+        this._fabricCanvas.off('object:modified', this._constrainObject);
+        this._fabricCanvas.off('mouse:down', this._constrainMouseDown);
+        this._fabricCanvas.off('mouse:move', this._constrainMouseMove);
+    }
+
+    private readonly _constrainMouseDown = (e: any): void => {
+        if (!this._config.constrainToImage || !this._imageBounds) return;
+        const pointer = this._fabricCanvas.getScenePoint(e.e);
+        const imgBounds = this._imageBounds;
+
+        if (pointer.x < imgBounds.left || pointer.x > imgBounds.left + imgBounds.width ||
+            pointer.y < imgBounds.top || pointer.y > imgBounds.top + imgBounds.height) {
+            e.e.preventDefault();
+            e.e.stopPropagation();
+            this._fabricCanvas.selection = false;
+        }
+    };
+
+    private readonly _constrainMouseMove = (e: any): void => {
+        if (!this._config.constrainToImage || !this._imageBounds) return;
+
+        const pointer = this._fabricCanvas.getScenePoint(e.e);
+        const imgBounds = this._imageBounds;
+
+        const constrained = {
+            x: Math.max(imgBounds.left, Math.min(pointer.x, imgBounds.left + imgBounds.width)),
+            y: Math.max(imgBounds.top, Math.min(pointer.y, imgBounds.top + imgBounds.height))
+        };
+
+        if (constrained.x !== pointer.x || constrained.y !== pointer.y) {
+            e.pointer = constrained;
+            if (this._fabricCanvas.isDrawingMode && this._fabricCanvas.freeDrawingBrush) {
+                (this._fabricCanvas.freeDrawingBrush as any)._finalizeAndAddPath?.();
+            }
+        }
+    };
+
+    private readonly _constrainObject = (e: any): void => {
+        if (!this._config.constrainToImage || !this._imageBounds) return;
+
+        const obj = e.target || e.transform?.target;
+        if (!obj) return;
+
+        const bounds = obj.getBoundingRect(true);
+        const imgBounds = this._imageBounds;
+
+        let adjusted = false;
+
+        if (bounds.left < imgBounds.left) {
+            obj.left = obj.left! + (imgBounds.left - bounds.left);
+            adjusted = true;
+        }
+        if (bounds.top < imgBounds.top) {
+            obj.top = obj.top! + (imgBounds.top - bounds.top);
+            adjusted = true;
+        }
+        if (bounds.left + bounds.width > imgBounds.left + imgBounds.width) {
+            obj.left = obj.left! - (bounds.left + bounds.width - (imgBounds.left + imgBounds.width));
+            adjusted = true;
+        }
+        if (bounds.top + bounds.height > imgBounds.top + imgBounds.height) {
+            obj.top = obj.top! - (bounds.top + bounds.height - (imgBounds.top + imgBounds.height));
+            adjusted = true;
+        }
+
+        if (adjusted) {
+            obj.setCoords();
+            this._fabricCanvas.requestRenderAll();
+        }
+    };
 }
 
 const validateDependencies = (): void => {

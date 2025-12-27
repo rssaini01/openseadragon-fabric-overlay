@@ -15,6 +15,7 @@ export function App() {
   const [opacity, setOpacity] = useState(1);
   const [exactSelection, setExactSelection] = useState(true);
   const [selectAllMode, setSelectAllMode] = useState(false);
+  const [constrainToImage, setConstrainToImage] = useState(false);
   const [objectCount, setObjectCount] = useState(0);
   const overlayRef = useRef<FabricOverlay | null>(null);
 
@@ -94,6 +95,11 @@ export function App() {
           setExactSelection={setExactSelection}
           selectAllMode={selectAllMode}
           setSelectAllMode={setSelectAllMode}
+          constrainToImage={constrainToImage}
+          setConstrainToImage={(enabled) => {
+            setConstrainToImage(enabled);
+            overlayRef.current?.setConstrainToImage(enabled);
+          }}
         />
       )}
       <div className="flex flex-1 overflow-hidden">

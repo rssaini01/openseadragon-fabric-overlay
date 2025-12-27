@@ -7,6 +7,8 @@ interface TopBarProps {
   setExactSelection: (exact: boolean) => void;
   selectAllMode: boolean;
   setSelectAllMode: (mode: boolean) => void;
+  constrainToImage: boolean;
+  setConstrainToImage: (enabled: boolean) => void;
 }
 
 export function TopBar({
@@ -18,6 +20,8 @@ export function TopBar({
   setExactSelection,
   selectAllMode,
   setSelectAllMode,
+  constrainToImage,
+  setConstrainToImage,
 }: Readonly<TopBarProps>) {
   return (
     <div className="bg-slate-800 border-b border-slate-700 px-4 py-2 flex items-center gap-4 shadow-lg animate-slide-down">
@@ -72,6 +76,22 @@ export function TopBar({
         >
           🔘 Select All
         </button>
+      </div>
+
+      <div className="w-px h-6 bg-slate-700"></div>
+
+      {/* Constraints */}
+      <div className="flex items-center gap-2">
+        <span className="text-xs font-semibold text-slate-400 uppercase">Constraints</span>
+        <label className="flex items-center gap-1.5 px-2.5 py-1.5 bg-slate-700/50 hover:bg-slate-700 rounded-md cursor-pointer transition-all text-sm">
+          <input
+            type="checkbox"
+            checked={constrainToImage}
+            onChange={(e) => setConstrainToImage((e.target as HTMLInputElement).checked)}
+            className="w-3.5 h-3.5 accent-emerald-500"
+          />
+          <span className="text-white">Constrain to Image</span>
+        </label>
       </div>
 
       <div className="flex-1"></div>
