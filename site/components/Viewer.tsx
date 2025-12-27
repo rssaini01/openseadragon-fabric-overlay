@@ -112,10 +112,10 @@ export function Viewer({
         if (currentTool === "rect") {
           (drawStateRef.current.activeShape as fabric.Rect).set({ left, top, width, height });
         } else if (currentTool === "circle") {
-          const radius = Math.min(width, height) / 2;
+          const radius = Math.hypot(width, height) / 2;
           (drawStateRef.current.activeShape as fabric.Circle).set({
-            left: start.x - radius,
-            top: start.y - radius,
+            left: (start.x + pointer.x) / 2 - radius,
+            top: (start.y + pointer.y) / 2 - radius,
             radius
           });
         }

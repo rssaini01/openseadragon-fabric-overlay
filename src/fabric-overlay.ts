@@ -202,7 +202,7 @@ class FabricOverlay {
         this._canvasDiv.remove();
     }
 
-    private _emit(event: keyof FabricOverlayEvents, data?: any): void {
+    private _emit(_event: keyof FabricOverlayEvents, _data?: any): void {
         // Simple event emission - could be enhanced with proper event system
     }
 

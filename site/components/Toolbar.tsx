@@ -133,11 +133,11 @@ export function Toolbar({
             onInput={(e) => {
               const target = e.target as HTMLInputElement;
               setOpacity(Number(target.value));
-              const percent = (Number(target.value) / 1) * 100;
+              const percent = (Number(target.value)) * 100;
               target.style.background = `linear-gradient(to right, rgb(168 85 247) ${percent}%, rgb(51 65 85) ${percent}%)`;
             }}
             className="w-12 accent-purple-500 cursor-pointer"
-            style={{ background: `linear-gradient(to right, rgb(168 85 247) ${(opacity / 1) * 100}%, rgb(51 65 85) ${(opacity / 1) * 100}%)` }}
+            style={{ background: `linear-gradient(to right, rgb(168 85 247) ${(opacity) * 100}%, rgb(51 65 85) ${(opacity) * 100}%)` }}
           />
           <span className="text-xs text-purple-400 font-bold">{opacity.toFixed(1)}</span>
         </div>

@@ -13,6 +13,11 @@ export default defineConfig(({ mode }) => ({
           : path.resolve(__dirname, "../src/fabric-overlay.ts"),
     },
   },
+  server: {
+    watch: {
+      usePolling: true,
+    },
+  },
   build: {
     outDir: "dist",
     emptyOutDir: true,
