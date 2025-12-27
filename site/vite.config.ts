@@ -1,7 +1,9 @@
 import { defineConfig } from "vite";
 import path from "node:path";
+import preact from "@preact/preset-vite";
 
 export default defineConfig(({ mode }) => ({
+  plugins: [preact()],
   base: mode === "prod" ? "/openseadragon-fabric-overlay" : "/",
   resolve: {
     alias: {

@@ -10,9 +10,12 @@
   "dependencies": {
     "fabric": "^6.9.0",
     "openseadragon": "^5.0.1",
-    "openseadragon-fabric-overlay": "file:.."
+    "openseadragon-fabric-overlay": "file:..",
+    "preact": "^10.24.3"
   },
   "devDependencies": {
+    "@preact/preset-vite": "^2.9.2",
+    "typescript": "^5.7.3",
     "vite": "^7.1.6"
   }
 }

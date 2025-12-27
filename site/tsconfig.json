@@ -1,8 +1,10 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
     "outDir": "dist",
-    "rootDir": "..",
+    "rootDir": ".",
     "baseUrl": ".",
     "paths": {
       "openseadragon-fabric-overlay": [
