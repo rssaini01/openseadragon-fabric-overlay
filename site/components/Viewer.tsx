@@ -27,7 +27,11 @@ export function Viewer({
 }: Readonly<ViewerProps>) {
   const viewerRef = useRef<OpenSeadragon.Viewer | null>(null);
   const overlayRef = useRef<FabricOverlay | null>(null);
-  const drawStateRef = useRef({ isDrawing: false, startPoint: null as { x: number; y: number } | null, activeShape: null as fabric.Object | null });
+  const drawStateRef = useRef({
+    isDrawing: false,
+    startPoint: null as { x: number; y: number } | null,
+    activeShape: null as fabric.Object | null
+  });
   const propsRef = useRef({ isFabricMode, currentTool, currentColor, opacity, selectAllMode });
 
   useEffect(() => {
@@ -67,14 +71,30 @@ export function Viewer({
         drawStateRef.current.isDrawing = true;
 
         if (currentTool === "text") {
-          const text = new fabric.FabricText("Sample Text", { left: pointer.x, top: pointer.y, fill: currentColor, fontSize: 20, opacity });
+          const text = new fabric.FabricText("Sample Text", {
+            left: pointer.x,
+            top: pointer.y,
+            fill: currentColor,
+            fontSize: 20,
+            opacity
+          });
           overlayRef.current.fabricCanvas().add(text);
           overlayRef.current.fabricCanvas().setActiveObject(text);
           return;
         }
 
-        const props = { left: pointer.x, top: pointer.y, fill: currentColor + "40", stroke: currentColor, strokeWidth: 2, opacity };
-        drawStateRef.current.activeShape = currentTool === "circle" ? new fabric.Circle({ ...props, radius: 1 }) : new fabric.Rect({ ...props, width: 1, height: 1 });
+        const props = {
+          left: pointer.x,
+          top: pointer.y,
+          fill: currentColor + "40",
+          stroke: currentColor,
+          strokeWidth: 2,
+          opacity
+        };
+        drawStateRef.current.activeShape = currentTool === "circle" ? new fabric.Circle({
+          ...props,
+          radius: 1
+        }) : new fabric.Rect({ ...props, width: 1, height: 1 });
         overlayRef.current.fabricCanvas().add(drawStateRef.current.activeShape);
       });
 
@@ -93,7 +113,11 @@ export function Viewer({
           (drawStateRef.current.activeShape as fabric.Rect).set({ left, top, width, height });
         } else if (currentTool === "circle") {
           const radius = Math.min(width, height) / 2;
-          (drawStateRef.current.activeShape as fabric.Circle).set({ left: start.x - radius, top: start.y - radius, radius });
+          (drawStateRef.current.activeShape as fabric.Circle).set({
+            left: start.x - radius,
+            top: start.y - radius,
+            radius
+          });
         }
         overlayRef.current.fabricCanvas().renderAll();
       });
@@ -143,7 +167,6 @@ export function Viewer({
     if (!overlayRef.current) return;
     overlayRef.current.setExactSelection(exactSelection);
   }, [exactSelection]);
-
 
   return <div id="openseadragon" style={{ width: "100%", height: "100%" }} />;
 }
