@@ -1,5 +1,6 @@
 import { defineConfig } from 'vitest/config';
 import path from 'node:path';
+import { codecovVitePlugin } from '@codecov/vite-plugin';
 
 export default defineConfig({
   resolve: {
@@ -20,4 +21,11 @@ export default defineConfig({
     reporters: ['default', 'junit'],
     outputFile: 'test-results.xml',
   },
+  plugins: [
+    codecovVitePlugin({
+      enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
+      bundleName: "osd-fabric-overlay",
+      uploadToken: process.env.CODECOV_TOKEN,
+    }),
+  ]
 });
