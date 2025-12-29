@@ -12,9 +12,9 @@
     "openseadragon-fabric-overlay": "file:.."
   },
   "devDependencies": {
-    "@types/jsdom": "^21.1.7",
+    "@types/jsdom": "^27.0.0",
     "@vitest/ui": "^4.0.16",
-    "jsdom": "^25.0.1",
+    "jsdom": "^27.4.0",
     "vitest": "^4.0.16"
   }
 }
