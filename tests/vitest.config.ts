@@ -1,24 +1,23 @@
 import { defineConfig } from 'vitest/config';
-import { codecovVitePlugin } from '@codecov/vite-plugin';
+import path from 'node:path';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, '../src')
+    }
+  },
   test: {
     environment: 'jsdom',
     globals: true,
+    root: '..',
     coverage: {
       provider: 'v8',
-      reporter: ['text', 'json-summary', 'json', 'html'],
-      include: ['../src/**/*.ts'],
-      exclude: ['../tests/**', '../site/**', '../dist/**'],
+      reporter: ['text', 'json', 'html'],
+      include: ['src/**/*.ts'],
+      reportsDirectory: './tests/coverage'
     },
     reporters: ['default', 'junit'],
-    outputFile: '../test-report.junit.xml',
+    outputFile: 'test-results.xml',
   },
-  plugins: [
-    codecovVitePlugin({
-      enableBundleAnalysis: process.env.CODECOV_TOKEN !== undefined,
-      bundleName: "openseadragon-fabric-overlay",
-      uploadToken: process.env.CODECOV_TOKEN,
-    }),
-  ],
 });
