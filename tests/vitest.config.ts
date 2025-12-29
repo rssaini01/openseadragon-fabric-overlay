@@ -8,8 +8,8 @@ export default defineConfig({
     coverage: {
       reporter: ['text', 'json-summary', 'json'],
     },
-    reporters: ['default', 'junit'],
-    outputFile: '../test-results.xml',
+    reporters: ['junit'],
+    outputFile: '../test-report.junit.xml',
   },
   plugins: [
     codecovVitePlugin({

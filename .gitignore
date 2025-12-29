@@ -2,5 +2,5 @@ node_modules/
 dist
 .idea
 demo-dist
-test-results.xml
+*.xml
 /tests/coverage
