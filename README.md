@@ -1,5 +1,6 @@
 # OpenSeadragon Fabric Overlay
 
+[![codecov](https://codecov.io/github/rssaini01/openseadragon-fabric-overlay/graph/badge.svg?token=DVRLSUSBQQ)](https://codecov.io/github/rssaini01/openseadragon-fabric-overlay)
 [![npm version](https://img.shields.io/npm/v/openseadragon-fabric-overlay.svg)](https://www.npmjs.com/package/openseadragon-fabric-overlay)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/rssaini01/openseadragon-fabric-overlay/deploy-demo-site.yml?branch=main)](https://github.com/rssaini01/openseadragon-fabric-overlay/actions)
