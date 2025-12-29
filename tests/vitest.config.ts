@@ -6,9 +6,12 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     coverage: {
-      reporter: ['text', 'json-summary', 'json'],
+      provider: 'v8',
+      reporter: ['text', 'json-summary', 'json', 'html'],
+      include: ['../src/**/*.ts'],
+      exclude: ['../tests/**', '../site/**', '../dist/**'],
     },
-    reporters: ['junit'],
+    reporters: ['default', 'junit'],
     outputFile: '../test-report.junit.xml',
   },
   plugins: [

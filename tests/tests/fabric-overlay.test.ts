@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { createFabricOverlay, initOSDFabricOverlay } from 'openseadragon-fabric-overlay';
+import { createFabricOverlay, initOSDFabricOverlay } from '../../src/fabric-overlay';
 
 // Mock OpenSeadragon
 const mockViewer = {
