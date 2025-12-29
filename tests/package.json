@@ -12,6 +12,7 @@
     "openseadragon-fabric-overlay": "file:.."
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
     "@types/jsdom": "^27.0.0",
     "@vitest/ui": "^4.0.16",
     "jsdom": "^27.4.0",

@@ -1,12 +1,10 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @layer base {
   * {
     @apply box-border;
   }
-  
+
   body {
     @apply m-0 p-0 overflow-hidden h-screen bg-slate-950;
   }
@@ -20,7 +18,7 @@
     left: 50%;
     top: 100%;
   }
-  
+
   [title] {
     @apply relative;
   }
@@ -30,20 +28,20 @@
   input[type="range"] {
     @apply appearance-none h-1.5 rounded-full cursor-pointer;
   }
-  
+
   input[type="range"]::-webkit-slider-thumb {
     @apply appearance-none w-4 h-4 rounded-full bg-white shadow-lg cursor-pointer;
     margin-top: -5px;
   }
-  
+
   input[type="range"]::-moz-range-thumb {
     @apply w-4 h-4 rounded-full bg-white shadow-lg cursor-pointer border-0;
   }
-  
+
   input[type="range"]::-webkit-slider-runnable-track {
     @apply h-1.5 rounded-full;
   }
-  
+
   input[type="range"]::-moz-range-track {
     @apply h-1.5 rounded-full;
   }
