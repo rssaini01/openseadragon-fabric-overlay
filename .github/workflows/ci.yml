@@ -30,6 +30,11 @@ jobs:
       - name: Run tests
         run: npm test
 
+      - name: Upload results to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
       - name: Test Report
         uses: dorny/test-reporter@v1
         if: success() || failure()

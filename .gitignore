@@ -3,3 +3,4 @@ dist
 .idea
 demo-dist
 test-results.xml
+/tests/coverage
