@@ -2,7 +2,7 @@ name: Auto Tag & Release on Version Bump
 
 on:
   workflow_run:
-    workflows: ["Build & Test"]
+    workflows: [ "Build & Test" ]
     types:
       - completed
     branches:
@@ -44,16 +44,30 @@ jobs:
           git tag -a "$new_tag" -m "Release $new_tag"
           git push origin "$new_tag"
 
+      - name: Generate release notes
+        if: steps.package.outputs.version != steps.tag.outputs.latest
+        id: release_notes
+        run: |
+          if [ -z "${{ steps.tag.outputs.latest }}" ]; then
+            echo "## What's Changed" >> release_notes.md
+            echo "- Initial release" >> release_notes.md
+          else
+            echo "## What's Changed" >> release_notes.md
+            git log v${{ steps.tag.outputs.latest }}..HEAD --pretty=format:"- %s" --no-merges >> release_notes.md
+            echo "" >> release_notes.md
+            echo "**Full Changelog**: ${{ github.server_url }}/${{ github.repository }}/compare/v${{ steps.tag.outputs.latest }}...v${{ steps.package.outputs.version }}" >> release_notes.md
+          fi
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          cat release_notes.md >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Create GitHub Release
         if: steps.package.outputs.version != steps.tag.outputs.latest
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.package.outputs.version }}
           name: v${{ steps.package.outputs.version }}
-          body: |
-            Release v${{ steps.package.outputs.version }}
-
-            - Automated release based on package.json
-            - Compare [v${{steps.tag.outputs.latest}}...v${{steps.package.outputs.version}}](https://github.com/rssaini01/openseadragon-fabric-overlay/compare/v${{steps.tag.outputs.latest}}...v${{steps.package.outputs.version}})
+          body: ${{ steps.release_notes.outputs.notes }}
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
