@@ -8,7 +8,7 @@
     "build": "vite build --mode prod"
   },
   "dependencies": {
-    "fabric": "^6.9.0",
+    "fabric": "^7.1.0",
     "openseadragon": "^5.0.1",
     "openseadragon-fabric-overlay": "file:..",
     "preact": "^10.24.3"
