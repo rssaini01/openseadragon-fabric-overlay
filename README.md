@@ -8,6 +8,8 @@
 
 A powerful plugin that seamlessly integrates [FabricJS](http://fabricjs.com/) with [OpenSeadragon](https://openseadragon.github.io/), enabling interactive annotations, drawings, and shape manipulation on top of deep-zoom images.
 
+> **⚠️ Version 2.0 Breaking Changes**: This version uses Fabric.js 7.x..
+
 **[Live Demo](https://rssaini01.github.io/openseadragon-fabric-overlay/)** | **[Report Bug](https://github.com/rssaini01/openseadragon-fabric-overlay/issues)** | **[Request Feature](https://github.com/rssaini01/openseadragon-fabric-overlay/issues)**
 
 ## Features
@@ -32,14 +34,16 @@ npm install openseadragon-fabric-overlay
 Ensure you have the required peer dependencies installed:
 
 ```bash
-npm install openseadragon fabric
+npm install openseadragon fabric@^7.1.0
 ```
+
+> **Note**: Version 2.x requires Fabric.js 7.x. For Fabric.js 6.x support, use version 1.x.
 
 ## Quick Start
 
 ```typescript
 import OpenSeadragon from "openseadragon";
-import { fabric } from "fabric";
+import { Rect } from "fabric";
 import { initOSDFabricOverlay } from "openseadragon-fabric-overlay";
 
 // Initialize OpenSeadragon viewer
@@ -57,7 +61,7 @@ const overlay = initOSDFabricOverlay(viewer, {
 });
 
 // Add a rectangle
-const rect = new fabric.Rect({
+const rect = new Rect({
   left: 100,
   top: 100,
   width: 200,
@@ -126,7 +130,7 @@ overlay.fabricCanvas().clear();
 #### Rectangle
 
 ```typescript
-const rect = new fabric.Rect({
+const rect = new Rect({
   left: 200,
   top: 200,
   width: 300,
@@ -142,7 +146,7 @@ overlay.fabricCanvas().add(rect);
 #### Circle
 
 ```typescript
-const circle = new fabric.Circle({
+const circle = new Circle({
   left: 500,
   top: 300,
   radius: 100,
@@ -157,7 +161,7 @@ overlay.fabricCanvas().add(circle);
 #### Text
 
 ```typescript
-const text = new fabric.Text("Hello World", {
+const text = new Text("Hello World", {
   left: 300,
   top: 400,
   fontSize: 40,
@@ -171,7 +175,7 @@ overlay.fabricCanvas().add(text);
 #### Polygon
 
 ```typescript
-const polygon = new fabric.Polygon(
+const polygon = new Polygon(
   [
     { x: 100, y: 100 },
     { x: 200, y: 50 },
@@ -200,7 +204,7 @@ viewer.setMouseNavEnabled(false);
 const canvas = overlay.fabricCanvas();
 
 // Configure pencil brush
-canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+canvas.freeDrawingBrush = new PencilBrush(canvas);
 canvas.freeDrawingBrush.width = 5;
 canvas.freeDrawingBrush.color = "#000000";
 canvas.isDrawingMode = true;
@@ -213,7 +217,7 @@ viewer.setMouseNavEnabled(true);
 ### Spray Brush
 
 ```typescript
-canvas.freeDrawingBrush = new fabric.SprayBrush(canvas);
+canvas.freeDrawingBrush = new SprayBrush(canvas);
 canvas.freeDrawingBrush.width = 10;
 canvas.freeDrawingBrush.color = "#ff0000";
 canvas.isDrawingMode = true;
@@ -262,7 +266,7 @@ overlay.fabricCanvas().loadFromJSON(savedJson, () => {
 ### Custom Object Properties
 
 ```typescript
-const rect = new fabric.Rect({
+const rect = new Rect({
   left: 100,
   top: 100,
   width: 200,
