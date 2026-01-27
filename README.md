@@ -437,11 +437,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Acknowledgments
 
-This project builds upon the excellent work of:
+This project is inspired by [@altert](https://github.com/altert)'s [OpenseadragonFabricjsOverlay](https://github.com/altert/OpenseadragonFabricjsOverlay). The original package used JavaScript with Prototype-based functions, which caused type safety issues in strictly-typed codebases and was built for older OpenSeadragon versions.
 
-- [@brunoocastro](https://github.com/brunoocastro) - [openseadragon-fabric](https://github.com/brunoocastro/openseadragon-fabric)
-- [OpenSeadragon](https://openseadragon.github.io/) - Deep zoom image viewer
-- [FabricJS](http://fabricjs.com/) - Canvas library
+[@brunoocastro](https://github.com/brunoocastro) rewrote it in TypeScript as [openseadragon-fabric](https://github.com/brunoocastro/openseadragon-fabric). This package builds upon that work with optimizations and extended functionality.
 
 ## Support
 
