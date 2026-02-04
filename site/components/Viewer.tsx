@@ -15,6 +15,19 @@ interface ViewerProps {
   onOverlayReady: (overlay: FabricOverlay) => void;
 }
 
+/**
+ * Renders an OpenSeadragon viewer with an integrated Fabric overlay and enables interactive annotation tools.
+ *
+ * @param isFabricMode - When true, enables Fabric-based interactions (selection, shapes, text, freehand); when false, viewer pan/zoom is enabled.
+ * @param currentTool - Active annotation tool: "select", "draw", "rect", "circle", or "text".
+ * @param currentColor - Color used for strokes/fills and freehand drawing.
+ * @param brushSize - Stroke width for freehand drawing.
+ * @param opacity - Opacity applied to newly created shapes and text.
+ * @param exactSelection - If true, uses exact (pixel-perfect) selection for Fabric objects.
+ * @param selectAllMode - When true, a mouse down selects all objects at the clicked scene point.
+ * @param onOverlayReady - Callback invoked once the Fabric overlay is initialized with the overlay instance.
+ * @returns A React element: a full-size div that hosts the OpenSeadragon viewer and its Fabric overlay.
+ */
 export function Viewer({
   isFabricMode,
   currentTool,

@@ -438,6 +438,14 @@ export function createFabricOverlay(
     return new FabricOverlay(viewer, config, id);
 }
 
+/**
+ * Creates and initializes a FabricOverlay tied to the given OpenSeadragon viewer.
+ *
+ * @param viewer - The OpenSeadragon viewer to attach the overlay to
+ * @param options - Optional configuration; `fabricCanvasOptions` are forwarded to the Fabric Canvas constructor
+ * @param id - Identifier used to name the created canvas element
+ * @returns The initialized FabricOverlay instance
+ */
 export function initOSDFabricOverlay(
     viewer: OpenSeadragon.Viewer,
     options: { fabricCanvasOptions?: Partial<CanvasOptions> },
