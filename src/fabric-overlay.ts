@@ -1,8 +1,16 @@
-import * as fabric from "fabric";
+import {
+    Canvas,
+    Point,
+    ActiveSelection,
+    FabricObject,
+    PencilBrush,
+    type CanvasOptions,
+    type TPointerEventInfo
+} from "fabric";
 import OpenSeadragon from "openseadragon";
 
 export interface FabricOverlayConfig {
-    fabricCanvasOptions?: Partial<fabric.CanvasOptions>;
+    fabricCanvasOptions?: Partial<CanvasOptions>;
     enableAutoResize?: boolean;
     enableMouseEvents?: boolean;
     constrainToImage?: boolean;
@@ -17,7 +25,7 @@ export interface FabricOverlayEvents {
 class FabricOverlay {
     private readonly _viewer: OpenSeadragon.Viewer;
     private _canvas!: HTMLCanvasElement;
-    private readonly _fabricCanvas!: fabric.Canvas;
+    private readonly _fabricCanvas!: Canvas;
     private readonly _config: Required<FabricOverlayConfig>;
 
     private readonly _id: string;
@@ -37,7 +45,7 @@ class FabricOverlay {
         return this._canvas;
     }
 
-    fabricCanvas(): fabric.Canvas {
+    fabricCanvas(): Canvas {
         this._checkDestroyed();
         return this._fabricCanvas;
     }
@@ -129,7 +137,7 @@ class FabricOverlay {
         const pageScroll = OpenSeadragon.getPageScroll();
 
         this._fabricCanvas.absolutePan(
-            new fabric.Point(
+            new Point(
                 canvasOffset.left - Math.round(viewportWindowPoint.x) + pageScroll.x,
                 canvasOffset.top - Math.round(viewportWindowPoint.y) + pageScroll.y
             )
@@ -149,7 +157,7 @@ class FabricOverlay {
         this._viewer.setMouseNavEnabled(enabled);
     }
 
-    setDrawingMode(enabled: boolean, brush?: fabric.BaseBrush): void {
+    setDrawingMode(enabled: boolean, brush?: PencilBrush): void {
         this._checkDestroyed();
         this._fabricCanvas.isDrawingMode = enabled;
         if (enabled && brush) {
@@ -176,13 +184,13 @@ class FabricOverlay {
         }
     }
 
-    selectAllAtPoint(x: number, y: number): fabric.FabricObject[] {
+    selectAllAtPoint(x: number, y: number): FabricObject[] {
         this._checkDestroyed();
         const objects = this._fabricCanvas.getObjects().filter(obj =>
-            obj.containsPoint(new fabric.Point(x, y))
+            obj.containsPoint(new Point(x, y))
         );
         if (objects.length > 0) {
-            const selection = new fabric.ActiveSelection(objects, {
+            const selection = new ActiveSelection(objects, {
                 canvas: this._fabricCanvas
             });
             this._fabricCanvas.setActiveObject(selection);
@@ -221,7 +229,7 @@ class FabricOverlay {
         this._id = `osd-canvas-${id}`;
 
         this._setupCanvas();
-        this._fabricCanvas = new fabric.Canvas(this._canvas, this._config.fabricCanvasOptions);
+        this._fabricCanvas = new Canvas(this._canvas, this._config.fabricCanvasOptions);
         this._setupEventHandlers();
         this._initialResize();
 
@@ -248,14 +256,14 @@ class FabricOverlay {
 
     private _setupEventHandlers(): void {
         if (this._config.enableMouseEvents) {
-            this._fabricCanvas.on('mouse:down', (e: fabric.TPointerEventInfo) => {
+            this._fabricCanvas.on('mouse:down', (e: TPointerEventInfo) => {
                 if (e.target) {
                     e.e.preventDefault();
                     e.e.stopPropagation();
                 }
             });
 
-            this._fabricCanvas.on('mouse:up', (e: fabric.TPointerEventInfo) => {
+            this._fabricCanvas.on('mouse:up', (e: TPointerEventInfo) => {
                 if (e.target) {
                     e.e.preventDefault();
                     e.e.stopPropagation();
@@ -411,11 +419,20 @@ const validateDependencies = (): void => {
     if (!OpenSeadragon) {
         throw new Error('[openseadragon-fabric-overlay] OpenSeadragon is required');
     }
-    if (!fabric?.Canvas) {
+    if (!Canvas) {
         throw new Error('[openseadragon-fabric-overlay] FabricJS is required');
     }
 };
 
+/**
+ * Create a FabricOverlay instance bound to an OpenSeadragon viewer.
+ *
+ * @param viewer - The OpenSeadragon viewer to attach the overlay to
+ * @param config - Optional configuration for the overlay
+ * @param id - DOM id to assign to the overlay canvas container
+ * @returns The created FabricOverlay instance
+ * @throws Error if `viewer` is not a valid OpenSeadragon viewer instance
+ */
 export function createFabricOverlay(
     viewer: OpenSeadragon.Viewer,
     config: FabricOverlayConfig = {},
@@ -430,9 +447,17 @@ export function createFabricOverlay(
     return new FabricOverlay(viewer, config, id);
 }
 
+/**
+ * Creates and initializes a FabricOverlay tied to the given OpenSeadragon viewer.
+ *
+ * @param viewer - The OpenSeadragon viewer to attach the overlay to
+ * @param options - Optional configuration; `fabricCanvasOptions` are forwarded to the Fabric Canvas constructor
+ * @param id - Identifier used to name the created canvas element
+ * @returns The initialized FabricOverlay instance
+ */
 export function initOSDFabricOverlay(
     viewer: OpenSeadragon.Viewer,
-    options: { fabricCanvasOptions?: Partial<fabric.CanvasOptions> },
+    options: { fabricCanvasOptions?: Partial<CanvasOptions> },
     id: string
 ): FabricOverlay {
     return createFabricOverlay(viewer, options, id);

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "preact/hooks";
 import OpenSeadragon from "openseadragon";
 import { FabricOverlay, initOSDFabricOverlay } from "openseadragon-fabric-overlay";
-import * as fabric from "fabric";
+import { Circle, Rect, FabricText, PencilBrush, type TPointerEventInfo, type FabricObject } from "fabric";
 import type { Tool } from "../App";
 
 interface ViewerProps {
@@ -15,6 +15,19 @@ interface ViewerProps {
   onOverlayReady: (overlay: FabricOverlay) => void;
 }
 
+/**
+ * Renders an OpenSeadragon viewer with an integrated Fabric overlay and enables interactive annotation tools.
+ *
+ * @param isFabricMode - When true, enables Fabric-based interactions (selection, shapes, text, freehand); when false, viewer pan/zoom is enabled.
+ * @param currentTool - Active annotation tool: "select", "draw", "rect", "circle", or "text".
+ * @param currentColor - Color used for strokes/fills and freehand drawing.
+ * @param brushSize - Stroke width for freehand drawing.
+ * @param opacity - Opacity applied to newly created shapes and text.
+ * @param exactSelection - If true, uses exact (pixel-perfect) selection for Fabric objects.
+ * @param selectAllMode - When true, a mouse down selects all objects at the clicked scene point.
+ * @param onOverlayReady - Callback invoked once the Fabric overlay is initialized with the overlay instance.
+ * @returns A React element: a full-size div that hosts the OpenSeadragon viewer and its Fabric overlay.
+ */
 export function Viewer({
   isFabricMode,
   currentTool,
@@ -30,7 +43,7 @@ export function Viewer({
   const drawStateRef = useRef({
     isDrawing: false,
     startPoint: null as { x: number; y: number } | null,
-    activeShape: null as fabric.Object | null
+    activeShape: null as FabricObject | null
   });
   const propsRef = useRef({ isFabricMode, currentTool, currentColor, opacity, selectAllMode });
 
@@ -54,7 +67,7 @@ export function Viewer({
 
       const canvas = overlayRef.current.fabricCanvas();
 
-      canvas.on("mouse:down", (e: fabric.TPointerEventInfo) => {
+      canvas.on("mouse:down", (e: TPointerEventInfo) => {
         const { isFabricMode, currentTool, currentColor, opacity, selectAllMode } = propsRef.current;
         if (!isFabricMode || currentTool === "draw" || !overlayRef.current) return;
 
@@ -71,7 +84,7 @@ export function Viewer({
         drawStateRef.current.isDrawing = true;
 
         if (currentTool === "text") {
-          const text = new fabric.FabricText("Sample Text", {
+          const text = new FabricText("Sample Text", {
             left: pointer.x,
             top: pointer.y,
             fill: currentColor,
@@ -89,16 +102,18 @@ export function Viewer({
           fill: currentColor + "40",
           stroke: currentColor,
           strokeWidth: 2,
-          opacity
+          opacity,
+          originX: "left" as const,
+          originY: "top" as const
         };
-        drawStateRef.current.activeShape = currentTool === "circle" ? new fabric.Circle({
+        drawStateRef.current.activeShape = currentTool === "circle" ? new Circle({
           ...props,
           radius: 1
-        }) : new fabric.Rect({ ...props, width: 1, height: 1 });
+        }) : new Rect({ ...props, width: 1, height: 1 });
         overlayRef.current.fabricCanvas().add(drawStateRef.current.activeShape);
       });
 
-      canvas.on("mouse:move", (e: fabric.TPointerEventInfo) => {
+      canvas.on("mouse:move", (e: TPointerEventInfo) => {
         const { currentTool } = propsRef.current;
         if (!drawStateRef.current.isDrawing || !drawStateRef.current.startPoint || !drawStateRef.current.activeShape || !overlayRef.current) return;
 
@@ -110,16 +125,16 @@ export function Viewer({
         const top = Math.min(start.y, pointer.y);
 
         if (currentTool === "rect") {
-          (drawStateRef.current.activeShape as fabric.Rect).set({ left, top, width, height });
+          (drawStateRef.current.activeShape as Rect).set({ left, top, width, height });
         } else if (currentTool === "circle") {
-          const radius = Math.hypot(width, height) / 2;
-          (drawStateRef.current.activeShape as fabric.Circle).set({
-            left: (start.x + pointer.x) / 2 - radius,
-            top: (start.y + pointer.y) / 2 - radius,
+          const radius = Math.max(width, height) / 2;
+          (drawStateRef.current.activeShape as Circle).set({
+            left,
+            top,
             radius
           });
         }
-        overlayRef.current.fabricCanvas().renderAll();
+        overlayRef.current.fabricCanvas().requestRenderAll();
       });
 
       canvas.on("mouse:up", () => {
@@ -155,7 +170,7 @@ export function Viewer({
 
     if (currentTool === "draw") {
       canvas.isDrawingMode = true;
-      canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+      canvas.freeDrawingBrush = new PencilBrush(canvas);
       canvas.freeDrawingBrush.width = brushSize;
       canvas.freeDrawingBrush.color = currentColor;
     } else {
