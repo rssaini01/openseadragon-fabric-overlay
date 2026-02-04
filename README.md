@@ -8,8 +8,7 @@
 
 A powerful plugin that seamlessly integrates [FabricJS](http://fabricjs.com/) with [OpenSeadragon](https://openseadragon.github.io/), enabling interactive annotations, drawings, and shape manipulation on top of deep-zoom images.
 
-> **⚠️ Version 2.0 Breaking Changes**: This version uses Fabric.js 7.x..
-
+> **⚠️ Version 2.0 Breaking Changes**: This version uses Fabric.js 7.x.
 **[Live Demo](https://rssaini01.github.io/openseadragon-fabric-overlay/)** | **[Report Bug](https://github.com/rssaini01/openseadragon-fabric-overlay/issues)** | **[Request Feature](https://github.com/rssaini01/openseadragon-fabric-overlay/issues)**
 
 ## Features
