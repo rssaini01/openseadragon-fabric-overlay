@@ -424,6 +424,15 @@ const validateDependencies = (): void => {
     }
 };
 
+/**
+ * Create a FabricOverlay instance bound to an OpenSeadragon viewer.
+ *
+ * @param viewer - The OpenSeadragon viewer to attach the overlay to
+ * @param config - Optional configuration for the overlay
+ * @param id - DOM id to assign to the overlay canvas container
+ * @returns The created FabricOverlay instance
+ * @throws Error if `viewer` is not a valid OpenSeadragon viewer instance
+ */
 export function createFabricOverlay(
     viewer: OpenSeadragon.Viewer,
     config: FabricOverlayConfig = {},
