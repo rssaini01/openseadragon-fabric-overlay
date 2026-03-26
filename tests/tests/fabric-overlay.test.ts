@@ -32,10 +32,18 @@ vi.mock('fabric', () => {
 
     const MockActiveSelection = vi.fn(function (this: any) {});
 
+    const MockFabricObject = {
+        ownDefaults: {
+            originX: 'center',
+            originY: 'center'
+        }
+    };
+
     return {
         Canvas: MockCanvas,
         Point: MockPoint,
-        ActiveSelection: MockActiveSelection
+        ActiveSelection: MockActiveSelection,
+        FabricObject: MockFabricObject
     };
 });
 

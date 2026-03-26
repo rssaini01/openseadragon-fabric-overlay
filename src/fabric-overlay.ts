@@ -3,9 +3,10 @@ import {
     Point,
     ActiveSelection,
     FabricObject,
-    PencilBrush,
     type CanvasOptions,
-    type TPointerEventInfo
+    type TPointerEventInfo,
+    type TOriginX,
+    type TOriginY
 } from "fabric";
 import OpenSeadragon from "openseadragon";
 
@@ -14,7 +15,7 @@ export interface FabricOverlayConfig {
     enableAutoResize?: boolean;
     enableMouseEvents?: boolean;
     constrainToImage?: boolean;
-    defaultObjectOptions?: () => void;
+    defaultObjectOrigin?: { originX: TOriginX; originY: TOriginY };
 }
 
 export interface FabricOverlayEvents {
@@ -158,7 +159,7 @@ class FabricOverlay {
         this._viewer.setMouseNavEnabled(enabled);
     }
 
-    setDrawingMode(enabled: boolean, brush?: PencilBrush): void {
+    setDrawingMode(enabled: boolean, brush?: Canvas["freeDrawingBrush"]): void {
         this._checkDestroyed();
         this._fabricCanvas.isDrawingMode = enabled;
         if (enabled && brush) {
@@ -262,14 +263,9 @@ class FabricOverlay {
      * This method ensures consistent behavior across versions.
      */
     private _setFabricDefaults(): void {
-        if (this._config.defaultObjectOptions) {
-            this._config.defaultObjectOptions();
-        } else {
-            // Set default object origins to top-left for intuitive positioning
-            // This maintains backward compatibility with Fabric.js < 7.0
-            FabricObject.ownDefaults.originX = 'left';
-            FabricObject.ownDefaults.originY = 'top';
-        }
+        const origin = this._config.defaultObjectOrigin ?? { originX: 'left', originY: 'top' };
+        FabricObject.ownDefaults.originX = origin.originX;
+        FabricObject.ownDefaults.originY = origin.originY;
     }
 
     private _setupEventHandlers(): void {

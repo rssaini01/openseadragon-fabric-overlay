@@ -8,16 +8,16 @@
     "build": "vite build --mode prod"
   },
   "dependencies": {
-    "fabric": "^7.1.0",
+    "fabric": "^7.2.0",
     "openseadragon": "^5.0.1",
     "openseadragon-fabric-overlay": "file:..",
-    "preact": "^10.24.3"
+    "preact": "^10.29.0"
   },
   "devDependencies": {
-    "@preact/preset-vite": "^2.9.2",
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.49",
-    "tailwindcss": "^4.1.18",
+    "@preact/preset-vite": "^2.10.5",
+    "autoprefixer": "^10.4.27",
+    "postcss": "^8.5.8",
+    "tailwindcss": "^4.2.2",
     "typescript": "^5.7.3",
     "vite": "^7.1.6"
   }
