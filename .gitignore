@@ -4,3 +4,4 @@ dist
 demo-dist
 *.xml
 /tests/coverage
+openseadragon-fabric-overlay-*.tgz

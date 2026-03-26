@@ -1,72 +1,53 @@
-name: Auto Tag & Release on Version Bump
+name: Release on Tag
 
 on:
-  workflow_run:
-    workflows: [ "Build & Test" ]
-    types:
-      - completed
-    branches:
-      - main
+  push:
+    tags:
+      - 'v*'
 
 permissions:
   contents: write
 
 jobs:
-  tag-and-release:
+  release:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # important for tags
-          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
-      - name: Get package.json version
-        id: package
-        run: echo "version=$(jq -r .version package.json)" >> $GITHUB_OUTPUT
+      - name: Get version from tag
+        id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
 
-      - name: Get latest tag
-        id: tag
+      - name: Get previous tag
+        id: prev_tag
         run: |
-          latest_tag=$(git tag -l "v*" --sort=-v:refname | head -n 1 || echo "")
-          # strip "v" prefix if exists
-          latest_version="${latest_tag#v}"
-          echo "latest=$latest_version" >> $GITHUB_OUTPUT
-
-      - name: Create Git tag if needed
-        if: steps.package.outputs.version != steps.tag.outputs.latest
-        run: |
-          new_tag="v${{ steps.package.outputs.version }}"
-          echo "Tagging new version: $new_tag"
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "$new_tag" -m "Release $new_tag"
-          git push origin "$new_tag"
+          prev_tag=$(git tag -l "v*" --sort=-v:refname | sed -n '2p' || echo "")
+          echo "tag=$prev_tag" >> $GITHUB_OUTPUT
 
       - name: Generate release notes
-        if: steps.package.outputs.version != steps.tag.outputs.latest
         id: release_notes
         run: |
-          if [ -z "${{ steps.tag.outputs.latest }}" ]; then
+          if [ -z "${{ steps.prev_tag.outputs.tag }}" ]; then
             echo "## What's Changed" >> release_notes.md
             echo "- Initial release" >> release_notes.md
           else
             echo "## What's Changed" >> release_notes.md
-            git log v${{ steps.tag.outputs.latest }}..HEAD --pretty=format:"- %s" --no-merges >> release_notes.md
+            git log ${{ steps.prev_tag.outputs.tag }}..HEAD --pretty=format:"- %s" --no-merges >> release_notes.md
             echo "" >> release_notes.md
-            echo "**Full Changelog**: ${{ github.server_url }}/${{ github.repository }}/compare/v${{ steps.tag.outputs.latest }}...v${{ steps.package.outputs.version }}" >> release_notes.md
+            echo "**Full Changelog**: ${{ github.server_url }}/${{ github.repository }}/compare/${{ steps.prev_tag.outputs.tag }}...${{ github.ref_name }}" >> release_notes.md
           fi
           echo "notes<<EOF" >> $GITHUB_OUTPUT
           cat release_notes.md >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Create GitHub Release
-        if: steps.package.outputs.version != steps.tag.outputs.latest
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ steps.package.outputs.version }}
-          name: v${{ steps.package.outputs.version }}
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
           body: ${{ steps.release_notes.outputs.notes }}
           generate_release_notes: true
         env:

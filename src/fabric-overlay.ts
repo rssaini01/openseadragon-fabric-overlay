@@ -14,6 +14,7 @@ export interface FabricOverlayConfig {
     enableAutoResize?: boolean;
     enableMouseEvents?: boolean;
     constrainToImage?: boolean;
+    defaultObjectOptions?: () => void;
 }
 
 export interface FabricOverlayEvents {
@@ -26,7 +27,7 @@ class FabricOverlay {
     private readonly _viewer: OpenSeadragon.Viewer;
     private _canvas!: HTMLCanvasElement;
     private readonly _fabricCanvas!: Canvas;
-    private readonly _config: Required<FabricOverlayConfig>;
+    private readonly _config: FabricOverlayConfig;
 
     private readonly _id: string;
     private _imageBounds: { left: number; top: number; width: number; height: number } | null = null;
@@ -230,6 +231,7 @@ class FabricOverlay {
 
         this._setupCanvas();
         this._fabricCanvas = new Canvas(this._canvas, this._config.fabricCanvasOptions);
+        this._setFabricDefaults();
         this._setupEventHandlers();
         this._initialResize();
 
@@ -252,6 +254,22 @@ class FabricOverlay {
         this._canvas.id = this._id;
         this._canvas.style.pointerEvents = 'auto';
         this._canvasDiv.appendChild(this._canvas);
+    }
+
+    /**
+     * Set default Fabric.js object properties for better compatibility.
+     * In Fabric.js 7.x, the default origin changed from 'left'/'top' to 'center'/'center'.
+     * This method ensures consistent behavior across versions.
+     */
+    private _setFabricDefaults(): void {
+        if (this._config.defaultObjectOptions) {
+            this._config.defaultObjectOptions();
+        } else {
+            // Set default object origins to top-left for intuitive positioning
+            // This maintains backward compatibility with Fabric.js < 7.0
+            FabricObject.ownDefaults.originX = 'left';
+            FabricObject.ownDefaults.originY = 'top';
+        }
     }
 
     private _setupEventHandlers(): void {
