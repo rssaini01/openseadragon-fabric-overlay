@@ -2,6 +2,8 @@ interface TopBarProps {
   onDelete: () => void;
   onClearAll: () => void;
   onExport: () => void;
+  onRotateLeft: () => void;
+  onRotateRight: () => void;
   objectCount: number;
   exactSelection: boolean;
   setExactSelection: (exact: boolean) => void;
@@ -15,6 +17,8 @@ export function TopBar({
   onDelete,
   onClearAll,
   onExport,
+  onRotateLeft,
+  onRotateRight,
   objectCount,
   exactSelection,
   setExactSelection,
@@ -75,6 +79,27 @@ export function TopBar({
           title="Select All Mode"
         >
           🔘 Select All
+        </button>
+      </div>
+
+      <div className="w-px h-6 bg-slate-700"></div>
+
+      {/* Rotation */}
+      <div className="flex items-center gap-2">
+        <span className="text-xs font-semibold text-slate-400 uppercase">Rotation</span>
+        <button
+          className="px-3 py-1.5 bg-blue-600/80 hover:bg-blue-500 rounded-md text-white text-sm font-medium transition-all duration-300 hover:scale-105 shadow-md shadow-blue-500/30 flex items-center gap-1.5"
+          onClick={onRotateLeft}
+          title="Rotate Left 90°"
+        >
+          ↶ Left
+        </button>
+        <button
+          className="px-3 py-1.5 bg-blue-600/80 hover:bg-blue-500 rounded-md text-white text-sm font-medium transition-all duration-300 hover:scale-105 shadow-md shadow-blue-500/30 flex items-center gap-1.5"
+          onClick={onRotateRight}
+          title="Rotate Right 90°"
+        >
+          ↷ Right
         </button>
       </div>
 

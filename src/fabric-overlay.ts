@@ -85,6 +85,14 @@ class FabricOverlay {
         this._fabricCanvas.renderAll();
     }
 
+    enableCanvasRotationInSync(): void {
+        this._viewer.addHandler("rotate", () => {
+            const rotation = this._viewer.viewport.getRotation();
+            this._canvasDiv.style.transform = `rotate(${rotation}deg)`;
+            this._canvasDiv.style.transformOrigin = 'center';
+        });
+    }
+
     private _checkDestroyed(): void {
         if (this._isDestroyed) {
             throw new Error('FabricOverlay has been destroyed');

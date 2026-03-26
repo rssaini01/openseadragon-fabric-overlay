@@ -13,6 +13,7 @@ interface ViewerProps {
   exactSelection: boolean;
   selectAllMode: boolean;
   onOverlayReady: (overlay: FabricOverlay) => void;
+  onRotate: (viewer: OpenSeadragon.Viewer) => void;
 }
 
 export function Viewer({
@@ -24,6 +25,7 @@ export function Viewer({
   exactSelection,
   selectAllMode,
   onOverlayReady,
+  onRotate,
 }: Readonly<ViewerProps>) {
   const viewerRef = useRef<OpenSeadragon.Viewer | null>(null);
   const overlayRef = useRef<FabricOverlay | null>(null);
@@ -50,7 +52,9 @@ export function Viewer({
 
       overlayRef.current = initOSDFabricOverlay(viewerRef.current, { fabricCanvasOptions: { selection: true } }, "1");
       overlayRef.current.setExactSelection(true);
+      overlayRef.current.enableCanvasRotationInSync();
       onOverlayReady(overlayRef.current);
+      onRotate(viewerRef.current);
 
       const canvas = overlayRef.current.fabricCanvas();
 

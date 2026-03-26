@@ -18,6 +18,7 @@ export function App() {
   const [constrainToImage, setConstrainToImage] = useState(false);
   const [objectCount, setObjectCount] = useState(0);
   const overlayRef = useRef<FabricOverlay | null>(null);
+  const viewerRef = useRef<any>(null);
 
   const handleClearAll = () => {
     overlayRef.current?.clearFabric();
@@ -57,9 +58,43 @@ export function App() {
     link.click();
   };
 
+  const handleRotateLeft = () => {
+    if (viewerRef.current) {
+      viewerRef.current.viewport.setRotation(viewerRef.current.viewport.getRotation() - 90);
+    }
+  };
+
+  const handleRotateRight = () => {
+    if (viewerRef.current) {
+      viewerRef.current.viewport.setRotation(viewerRef.current.viewport.getRotation() + 90);
+    }
+  };
+
   const updateObjectCount = () => {
     const canvas = overlayRef.current?.fabricCanvas();
-    if (canvas) setObjectCount(canvas.getObjects().length);
+    if (canvas) {
+      setObjectCount(canvas.getObjects().length);
+      saveToLocalStorage();
+    }
+  };
+
+  const saveToLocalStorage = () => {
+    const canvas = overlayRef.current?.fabricCanvas();
+    if (canvas) {
+      const json = canvas.toJSON();
+      localStorage.setItem('fabricCanvas', JSON.stringify(json));
+    }
+  };
+
+  const loadFromLocalStorage = () => {
+    const saved = localStorage.getItem('fabricCanvas');
+    if (saved && overlayRef.current) {
+      const canvas = overlayRef.current.fabricCanvas();
+      canvas.loadFromJSON(JSON.parse(saved), () => {
+        canvas.renderAll();
+        setObjectCount(canvas.getObjects().length);
+      });
+    }
   };
 
   useEffect(() => {
@@ -90,6 +125,8 @@ export function App() {
           onDelete={handleDelete}
           onClearAll={handleClearAll}
           onExport={handleExport}
+          onRotateLeft={handleRotateLeft}
+          onRotateRight={handleRotateRight}
           objectCount={objectCount}
           exactSelection={exactSelection}
           setExactSelection={setExactSelection}
@@ -129,6 +166,11 @@ export function App() {
               const canvas = overlay.fabricCanvas();
               canvas.on("object:added", updateObjectCount);
               canvas.on("object:removed", updateObjectCount);
+              canvas.on("object:modified", saveToLocalStorage);
+              loadFromLocalStorage();
+            }}
+            onRotate={(viewer) => {
+              viewerRef.current = viewer;
             }}
           />
         </div>
